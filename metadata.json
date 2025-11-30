@@ -1,0 +1,7 @@
+{
+  "name": "The Banana Stand",
+  "description": "A Meta-App Store where users create and share mini-apps powered by Gemini. Features a viral Before/After slider UI and recipe-based generation.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
