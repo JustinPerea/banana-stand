@@ -15,6 +15,7 @@ import { checkApiKey, requestApiKey, isAIStudioAvailable } from './services/gemi
 import { supabase } from './services/supabase';
 import { User } from '@supabase/supabase-js';
 import { fetchAllAppStats, AppStats, getUserFavorites, toggleFavorite } from './services/statsService';
+import { FLAGSHIP_APPS } from './constants';
 
 // Separate content component to use the hook
 const AppContent = () => {
@@ -124,6 +125,12 @@ const AppContent = () => {
     // Refresh stats to get updated favorite count
     refreshStats();
   };
+
+  // Compute the actual BananaApp objects for favorites
+  const allApps = [...FLAGSHIP_APPS, ...communityApps, ...customApps];
+  const favoriteApps = userFavorites
+    .map(id => allApps.find(app => app.id === id))
+    .filter((app): app is BananaApp => app !== undefined);
 
   const handleSaveRecipe = (newApp: BananaApp) => {
     // Save to "Backend"
@@ -255,9 +262,10 @@ const AppContent = () => {
             )}
             
             <div className="h-6 w-px bg-stone-200 mx-1 hidden md:block"></div>
-            <UserMenu 
-                user={user} 
+            <UserMenu
+                user={user}
                 customApps={customApps}
+                favoriteApps={favoriteApps}
                 onSelectApp={setSelectedApp}
                 onCreateNew={() => {
                     setEditingRecipe(undefined);
