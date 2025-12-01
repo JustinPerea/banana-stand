@@ -245,11 +245,11 @@ export const FLAGSHIP_APPS: BananaApp[] = [
       { id: 'parent_2', type: 'image', label: 'Parent 2 Photo' },
       { id: 'gender', type: 'select', label: 'Baby Gender', options: ['Boy', 'Girl', 'Surprise Me'] }
     ],
-    system_instruction: 'You are an expert digital artist specializing in facial compositing and age regression. You understand genetics and how facial features are inherited and blended across different ethnicities and races.',
-    master_prompt: 'Create a photorealistic image of a young child (toddler age) that combines the facial features of {{parent_1}} and {{parent_2}}. Analyze the eye shape, nose structure, and skin tone of both parents and blend them naturally to reflect a realistic mixed-heritage background if the parents are of different races. If the user selected {{gender}}, aim for that appearance, otherwise keep it neutral. The result should look like a high-quality studio portrait of a real child.',
+    system_instruction: 'You are an expert digital artist specializing in facial compositing and age regression. You have deep knowledge of genetics and how facial features, skin tones, hair textures, and eye colors are inherited and blended across different ethnicities. You are particularly skilled at creating accurate representations of mixed-race children.',
+    master_prompt: 'IMPORTANT: First, carefully analyze the skin tone, ethnicity, and racial background of BOTH parents in {{parent_1}} and {{parent_2}}. Create a photorealistic image of a young child (toddler age) that authentically combines features from BOTH parents. The child\'s skin tone MUST reflect a realistic blend of both parents - if one parent has darker skin, the child should have a medium-to-dark complexion, NOT a white/pale complexion. Blend the eye shape, nose structure, lip fullness, hair texture, and facial bone structure from both parents proportionally. If the user selected {{gender}}, aim for that appearance. The result should look like a high-quality studio portrait of a real mixed-heritage child that clearly shows genetic influence from both parents.',
     model_config: {
-      temperature: 0.6,
-      thinking_mode: false,
+      temperature: 0.7,
+      thinking_mode: true,
       aspectRatio: '1:1'
     },
     // Placeholder paths - User needs to upload these
