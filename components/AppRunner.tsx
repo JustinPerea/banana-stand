@@ -211,11 +211,11 @@ const AppRunner: React.FC<AppRunnerProps> = ({ app, onBack, onRemix, onOpenSetti
         onStatsUpdate();
       }
 
-      // Save to local history
+      // Save to local history (compressed)
       const primaryInputId = app.inputs.find(i => i.type === 'image')?.id;
       const inputPreview = primaryInputId ? previews[primaryInputId] : undefined;
 
-      HistoryService.addToHistory({
+      await HistoryService.addToHistory({
         appId: app.id,
         appName: app.name,
         appEmoji: app.emoji,

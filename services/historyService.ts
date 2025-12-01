@@ -13,6 +13,41 @@ export interface HistoryItem {
 const HISTORY_KEY = 'banana_stand_history_v1';
 const MAX_HISTORY_ITEMS = 20;
 
+/**
+ * Compress an image to reduce storage size
+ * Returns a smaller base64 JPEG
+ */
+const compressImage = (dataUrl: string, maxWidth: number = 800, quality: number = 0.7): Promise<string> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+
+      // Scale down if larger than maxWidth
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, width, height);
+        // Convert to JPEG for better compression
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      } else {
+        resolve(dataUrl); // Fallback to original
+      }
+    };
+    img.onerror = () => resolve(dataUrl); // Fallback to original
+    img.src = dataUrl;
+  });
+};
+
 export const HistoryService = {
   /**
    * Get all history items from localStorage
@@ -30,13 +65,22 @@ export const HistoryService = {
 
   /**
    * Add a new item to history (keeps max 20 items)
+   * Compresses the image to fit in localStorage
    */
-  addToHistory: (item: Omit<HistoryItem, 'id' | 'createdAt'>): HistoryItem[] => {
+  addToHistory: async (item: Omit<HistoryItem, 'id' | 'createdAt'>): Promise<HistoryItem[]> => {
     try {
+      // Compress the image before storing
+      const compressedImage = await compressImage(item.imageData);
+      const compressedInput = item.inputPreview
+        ? await compressImage(item.inputPreview, 200, 0.5)
+        : undefined;
+
       const current = HistoryService.getHistory();
 
       const newItem: HistoryItem = {
         ...item,
+        imageData: compressedImage,
+        inputPreview: compressedInput,
         id: `history_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         createdAt: new Date().toISOString(),
       };
@@ -45,18 +89,21 @@ export const HistoryService = {
       const updated = [newItem, ...current].slice(0, MAX_HISTORY_ITEMS);
 
       localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
+      console.log('History saved successfully, total items:', updated.length);
       return updated;
     } catch (e) {
-      console.error('Failed to save to history', e);
+      console.error('Failed to save to history:', e);
       // If storage is full, try clearing old items and retry
       if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+        console.warn('localStorage quota exceeded, trimming history...');
         try {
           const current = HistoryService.getHistory();
-          // Keep only 10 items and try again
-          const trimmed = current.slice(0, 10);
+          // Keep only 5 items and try again
+          const trimmed = current.slice(0, 5);
           localStorage.setItem(HISTORY_KEY, JSON.stringify(trimmed));
           return HistoryService.addToHistory(item);
-        } catch {
+        } catch (retryError) {
+          console.error('Retry failed:', retryError);
           return [];
         }
       }
