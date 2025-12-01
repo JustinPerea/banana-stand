@@ -132,15 +132,15 @@ export const FLAGSHIP_APPS: BananaApp[] = [
       aspectRatio: '1:1'
     },
     // Vibrant / Sticker Vibe
-    cover_image: '/apps/sticker-moji-3000/holo-output-1.png',
+    cover_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/sticker-moji-3000/holo-output-1.png',
     // Portrait Woman
-    example_input_image: '/apps/sticker-moji-3000/input-1.jpeg',
+    example_input_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/sticker-moji-3000/input-1.jpeg',
     // Abstract Art / Vector Style
-    example_output_image: '/apps/sticker-moji-3000/holo-output-1.png',
+    example_output_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/sticker-moji-3000/holo-output-1.png',
     additional_images: [
-        { url: '/apps/sticker-moji-3000/cute-output-1.png', label: 'Cute' },
-        { url: '/apps/sticker-moji-3000/edgy-output-1.png', label: 'Edgy' },
-        { url: '/apps/sticker-moji-3000/retro-output-1.png', label: 'Retro' }
+        { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/sticker-moji-3000/cute-output-1.png', label: 'Cute' },
+        { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/sticker-moji-3000/edgy-output-1.png', label: 'Edgy' },
+        { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/sticker-moji-3000/retro-output-1.png', label: 'Retro' }
     ],
     input_tips: [
       "Use images with a clear central subject.",
@@ -175,11 +175,11 @@ export const FLAGSHIP_APPS: BananaApp[] = [
       aspectRatio: '3:4'
     },
     // Healthy Food Bowl
-    cover_image: '/apps/macro-vision-ai/hud-output-1.png',
+    cover_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/macro-vision-ai/hud-output-1.png',
     // Salad Input
-    example_input_image: '/apps/macro-vision-ai/input-1.png',
+    example_input_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/macro-vision-ai/input-1.png',
     // Similar Salad (Result vibe)
-    example_output_image: '/apps/macro-vision-ai/hud-output-1.png',
+    example_output_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/macro-vision-ai/hud-output-1.png',
     input_tips: [
       "Ensure the entire meal is visible.",
       "Good lighting helps with accurate identification.",
@@ -213,11 +213,11 @@ export const FLAGSHIP_APPS: BananaApp[] = [
       aspectRatio: '1:1'
     },
     // Neon Cyberpunk Portrait
-    cover_image: '/apps/vibe-coder-id/glitch-output-1.png',
+    cover_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/vibe-coder-id/glitch-output-1.png',
     // Man Portrait
-    example_input_image: '/apps/vibe-coder-id/input-1.png',
+    example_input_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/vibe-coder-id/input-1.png',
     // Glitch Art / Neon
-    example_output_image: '/apps/vibe-coder-id/glitch-output-1.png',
+    example_output_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/vibe-coder-id/glitch-output-1.png',
     additional_images: [],
     input_tips: [
       "Use a clear, close-up headshot.",
@@ -253,11 +253,11 @@ export const FLAGSHIP_APPS: BananaApp[] = [
       aspectRatio: '1:1'
     },
     // Placeholder paths - User needs to upload these
-    cover_image: '/apps/baby-face-mixer/baby-result-girl-1.png', 
-    example_input_image: ['/apps/baby-face-mixer/parent-1.png', '/apps/baby-face-mixer/parent-2.png'], 
-    example_output_image: '/apps/baby-face-mixer/baby-result-girl-1.png',
+    cover_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/baby-face-mixer/baby-result-girl-1.png',
+    example_input_image: ['https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/baby-face-mixer/parent-1.png', 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/baby-face-mixer/parent-2.png'],
+    example_output_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/baby-face-mixer/baby-result-girl-1.png',
     additional_images: [
-      { url: '/apps/baby-face-mixer/baby-result-boy-1.png', label: 'Boy Result' }
+      { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/baby-face-mixer/baby-result-boy-1.png', label: 'Boy Result' }
     ],
     input_tips: [
       "Upload clear front-facing photos of both parents.",
@@ -292,15 +292,15 @@ export const FLAGSHIP_APPS: BananaApp[] = [
       aspectRatio: 'match_input'
     },
     // Placeholder paths
-    cover_image: '/apps/zen-space-designer/mid-century-modern-output-1.png', 
-    example_input_image: '/apps/zen-space-designer/room-input-1.png',
-    example_output_image: '/apps/zen-space-designer/mid-century-modern-output-1.png',
+    cover_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/zen-space-designer/mid-century-modern-output-1.png',
+    example_input_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/zen-space-designer/room-input-1.png',
+    example_output_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/zen-space-designer/mid-century-modern-output-1.png',
     additional_images: [
-      { url: '/apps/zen-space-designer/minimalist-output-1.png', label: 'Minimalist' },
-      { url: '/apps/zen-space-designer/industrial-output-1.png', label: 'Industrial' },
-      { url: '/apps/zen-space-designer/bohemian-output-1.png', label: 'Bohemian' },
-      { url: '/apps/zen-space-designer/cyberpubk-output-1.png', label: 'Cyberpunk' },
-      { url: '/apps/zen-space-designer/scandinavian-output-1.png', label: 'Scandinavian' }
+      { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/zen-space-designer/minimalist-output-1.png', label: 'Minimalist' },
+      { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/zen-space-designer/industrial-output-1.png', label: 'Industrial' },
+      { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/zen-space-designer/bohemian-output-1.png', label: 'Bohemian' },
+      { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/zen-space-designer/cyberpubk-output-1.png', label: 'Cyberpunk' },
+      { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/zen-space-designer/scandinavian-output-1.png', label: 'Scandinavian' }
     ],
     input_tips: [
       "Use a wide-angle shot to capture the whole room.",
@@ -335,14 +335,10 @@ export const FLAGSHIP_APPS: BananaApp[] = [
       aspectRatio: 'match_input'
     },
     // Placeholder paths
-    cover_image: '/apps/time-traveler-lens/colorize-restore-output-1.png', 
-    example_input_image: '/apps/time-traveler-lens/input-1.png',
-    example_output_image: '/apps/time-traveler-lens/colorize-restore-output-1.png',
-    additional_images: [
-        { url: '/apps/time-traveler-lens/restore-only-bw-output-1.png', label: 'Restored B&W' },
-        { url: '/apps/time-traveler-lens/colorize-only-output-1.png', label: 'Color Only' },
-        { url: '/apps/time-traveler-lens/enhanced-details-output-1.png', label: 'Enhanced' }
-    ],
+    cover_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/time-traveler-lens/colorize-restore-output-1.png',
+    example_input_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/time-traveler-lens/input-1.png',
+    example_output_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/time-traveler-lens/colorize-restore-output-1.png',
+    additional_images: [],
     input_tips: [
       "Scan your photos at high resolution if possible.",
       "Ensure there is no glare on the photo surface.",
@@ -376,14 +372,14 @@ export const FLAGSHIP_APPS: BananaApp[] = [
       aspectRatio: 'match_input'
     },
     // Placeholder paths
-    cover_image: '/apps/product-studio-ai/luxary-podium-output-1.png', 
-    example_input_image: '/apps/product-studio-ai/input-1.png',
-    example_output_image: '/apps/product-studio-ai/luxary-podium-output-1.png',
+    cover_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/product-studio-ai/luxary-podium-output-1.png',
+    example_input_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/product-studio-ai/input-1.png',
+    example_output_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/product-studio-ai/luxary-podium-output-1.png',
     additional_images: [
-        { url: '/apps/product-studio-ai/lifestyle-kitchen-output-1.png', label: 'Kitchen' },
-        { url: '/apps/product-studio-ai/outdoor-nature-output-1.png', label: 'Nature' },
-        { url: '/apps/product-studio-ai/neon-cyberpunk-output-1.png', label: 'Cyberpunk' },
-        { url: '/apps/product-studio-ai/cozy-living-room-output-1.png', label: 'Living Room' }
+        { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/product-studio-ai/lifestyle-kitchen-output-1.png', label: 'Kitchen' },
+        { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/product-studio-ai/outdoor-nature-output-1.png', label: 'Nature' },
+        { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/product-studio-ai/neon-cyberpunk-output-1.png', label: 'Cyberpunk' },
+        { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/product-studio-ai/cozy-living-room-output-1.png', label: 'Living Room' }
     ],
     input_tips: [
       "Photograph your product against a plain background.",
