@@ -14,6 +14,7 @@ import { RecipeStore } from './services/recipeStore';
 import { checkApiKey, requestApiKey, isAIStudioAvailable } from './services/geminiService';
 import { supabase } from './services/supabase';
 import { User } from '@supabase/supabase-js';
+import { fetchAllAppStats, AppStats, getUserFavorites, toggleFavorite } from './services/statsService';
 
 // Separate content component to use the hook
 const AppContent = () => {
@@ -34,11 +35,15 @@ const AppContent = () => {
   // Theme State
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== 'undefined') {
-        return localStorage.getItem('theme') === 'dark' || 
+        return localStorage.getItem('theme') === 'dark' ||
                (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
     }
     return false;
   });
+
+  // App Stats State
+  const [appStats, setAppStats] = useState<Record<string, AppStats>>({});
+  const [userFavorites, setUserFavorites] = useState<string[]>([]);
 
   useEffect(() => {
       if (isDark) {
@@ -58,7 +63,15 @@ const AppContent = () => {
 
     // Load Community Apps
     RecipeStore.fetchCommunityRecipes().then(setCommunityApps);
+
+    // Load App Stats
+    fetchAllAppStats().then(setAppStats);
   }, [showKeyModal]); // Re-check key when modal closes
+
+  // Function to refresh stats (called after app runs)
+  const refreshStats = () => {
+    fetchAllAppStats().then(setAppStats);
+  };
 
   // Auth Listener
   useEffect(() => {
@@ -72,6 +85,45 @@ const AppContent = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Load user favorites when user changes
+  useEffect(() => {
+    if (user) {
+      getUserFavorites(user.id).then(setUserFavorites);
+    } else {
+      setUserFavorites([]);
+    }
+  }, [user]);
+
+  // Handle favorite toggle
+  const handleToggleFavorite = async (appId: string) => {
+    if (!user) {
+      showToast("Sign in to favorite apps!", 'error');
+      return;
+    }
+
+    // Optimistic update
+    const wasFavorited = userFavorites.includes(appId);
+    if (wasFavorited) {
+      setUserFavorites(prev => prev.filter(id => id !== appId));
+    } else {
+      setUserFavorites(prev => [...prev, appId]);
+    }
+
+    const newState = await toggleFavorite(user.id, appId);
+
+    // If the toggle returned a different state than expected, revert
+    if (newState !== !wasFavorited) {
+      if (wasFavorited) {
+        setUserFavorites(prev => [...prev, appId]);
+      } else {
+        setUserFavorites(prev => prev.filter(id => id !== appId));
+      }
+    }
+
+    // Refresh stats to get updated favorite count
+    refreshStats();
+  };
 
   const handleSaveRecipe = (newApp: BananaApp) => {
     // Save to "Backend"
@@ -232,9 +284,10 @@ const AppContent = () => {
             onBack={() => setSelectedApp(null)}
             onRemix={() => handleRemix(selectedApp)}
             onOpenSettings={() => setShowKeyModal(true)}
+            onStatsUpdate={refreshStats}
           />
         ) : (
-          <MarketplaceView 
+          <MarketplaceView
             customApps={customApps}
             communityApps={communityApps}
             onSelectApp={setSelectedApp}
@@ -242,6 +295,9 @@ const AppContent = () => {
               setEditingRecipe(undefined);
               setIsBuilding(true);
             }}
+            appStats={appStats}
+            userFavorites={userFavorites}
+            onToggleFavorite={user ? handleToggleFavorite : undefined}
           />
         )}
       </main>

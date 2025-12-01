@@ -4,15 +4,17 @@ import { BananaApp } from '../types';
 import { runBananaRecipe, checkApiKey } from '../services/geminiService';
 import BeforeAfterSlider from './BeforeAfterSlider';
 import BananaLoader from './BananaLoader';
+import { incrementUsageCount } from '../services/statsService';
 
 interface AppRunnerProps {
   app: BananaApp;
   onBack: () => void;
   onRemix: () => void;
   onOpenSettings?: () => void;
+  onStatsUpdate?: () => void;
 }
 
-const AppRunner: React.FC<AppRunnerProps> = ({ app, onBack, onRemix, onOpenSettings }) => {
+const AppRunner: React.FC<AppRunnerProps> = ({ app, onBack, onRemix, onOpenSettings, onStatsUpdate }) => {
   const [inputs, setInputs] = useState<Record<string, string | File>>({});
   const [previews, setPreviews] = useState<Record<string, string>>({});
   
@@ -196,6 +198,12 @@ const AppRunner: React.FC<AppRunnerProps> = ({ app, onBack, onRemix, onOpenSetti
         } else {
            throw new Error("No image generated.");
         }
+      }
+
+      // Increment usage count on successful generation
+      await incrementUsageCount(app.id);
+      if (onStatsUpdate) {
+        onStatsUpdate();
       }
 
     } catch (err: any) {

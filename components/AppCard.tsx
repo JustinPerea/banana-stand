@@ -2,22 +2,24 @@
 import React, { useMemo, useState } from 'react';
 import { BananaApp } from '../types';
 import { BananaIcon } from './Logo';
+import { AppStats } from '../services/statsService';
 
 interface AppCardProps {
   app: BananaApp;
   onClick: (app: BananaApp) => void;
   onAuthorClick?: (author: string) => void;
   onTagClick?: (tag: string) => void;
+  stats?: AppStats;
+  isFavorited?: boolean;
+  onToggleFavorite?: (appId: string) => void;
 }
 
-const AppCard: React.FC<AppCardProps> = ({ app, onClick, onAuthorClick, onTagClick }) => {
+const AppCard: React.FC<AppCardProps> = ({ app, onClick, onAuthorClick, onTagClick, stats, isFavorited, onToggleFavorite }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Generate random stats to make the store feel alive/viral
-  const stats = useMemo(() => ({
-    likes: Math.floor(Math.random() * 800) + 120,
-    remixes: Math.floor(Math.random() * 150) + 20,
-  }), []);
+  // Use real stats from database, fall back to 0 if not available
+  const usageCount = stats?.usage_count ?? 0;
+  const favoriteCount = stats?.favorite_count ?? 0;
 
   // Construct gallery from available images
   const gallery = useMemo(() => {
@@ -254,14 +256,22 @@ const AppCard: React.FC<AppCardProps> = ({ app, onClick, onAuthorClick, onTagCli
             <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1 text-stone-400 dark:text-stone-500" title="Total Runs">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                    {app.usage_count ? app.usage_count.toLocaleString() : 0}
+                    {usageCount.toLocaleString()}
                 </span>
-                <span className="flex items-center gap-1 hover:text-red-500 transition-colors">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-stone-300 dark:text-stone-600 group-hover:text-red-400 transition-colors">
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        if (onToggleFavorite) onToggleFavorite(app.id);
+                    }}
+                    className={`flex items-center gap-1 transition-colors ${onToggleFavorite ? 'hover:text-red-500 cursor-pointer' : 'cursor-default'}`}
+                    title={isFavorited ? "Remove from Favorites" : "Add to Favorites"}
+                    disabled={!onToggleFavorite}
+                >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill={isFavorited ? "currentColor" : "currentColor"} className={`transition-colors ${isFavorited ? 'text-red-500' : 'text-stone-300 dark:text-stone-600'} ${onToggleFavorite ? 'hover:text-red-400' : ''}`}>
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
-                    {stats.likes}
-                </span>
+                    {favoriteCount.toLocaleString()}
+                </button>
             </div>
         </div>
       </div>

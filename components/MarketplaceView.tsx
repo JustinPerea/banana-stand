@@ -4,19 +4,26 @@ import { BananaApp } from '../types';
 import AppCard from './AppCard';
 import { FLAGSHIP_APPS, APP_CATEGORIES } from '../constants';
 import FallingBananas from './FallingBananas';
+import { AppStats } from '../services/statsService';
 
 interface MarketplaceViewProps {
   customApps: BananaApp[];
   communityApps: BananaApp[];
   onSelectApp: (app: BananaApp) => void;
   onCreateNew: () => void;
+  appStats: Record<string, AppStats>;
+  userFavorites: string[];
+  onToggleFavorite?: (appId: string) => void;
 }
 
-const MarketplaceView: React.FC<MarketplaceViewProps> = ({ 
-  customApps, 
-  communityApps, 
-  onSelectApp, 
-  onCreateNew 
+const MarketplaceView: React.FC<MarketplaceViewProps> = ({
+  customApps,
+  communityApps,
+  onSelectApp,
+  onCreateNew,
+  appStats,
+  userFavorites,
+  onToggleFavorite
 }) => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedAuthor, setSelectedAuthor] = useState<string | null>(null);
@@ -190,6 +197,9 @@ const MarketplaceView: React.FC<MarketplaceViewProps> = ({
                   onClick={onSelectApp}
                   onAuthorClick={setSelectedAuthor}
                   onTagClick={setSelectedTag}
+                  stats={appStats[app.id]}
+                  isFavorited={userFavorites.includes(app.id)}
+                  onToggleFavorite={onToggleFavorite}
                 />
               ))}
               {filteredFlagshipApps.map((app) => (
@@ -199,6 +209,9 @@ const MarketplaceView: React.FC<MarketplaceViewProps> = ({
                   onClick={onSelectApp}
                   onAuthorClick={setSelectedAuthor}
                   onTagClick={setSelectedTag}
+                  stats={appStats[app.id]}
+                  isFavorited={userFavorites.includes(app.id)}
+                  onToggleFavorite={onToggleFavorite}
                 />
               ))}
             </div>
