@@ -15,6 +15,7 @@ import { checkApiKey, requestApiKey, isAIStudioAvailable } from './services/gemi
 import { supabase } from './services/supabase';
 import { User } from '@supabase/supabase-js';
 import { fetchAllAppStats, AppStats, getUserFavorites, toggleFavorite } from './services/statsService';
+import { HistoryService, HistoryItem } from './services/historyService';
 import { FLAGSHIP_APPS } from './constants';
 
 // Separate content component to use the hook
@@ -46,6 +47,10 @@ const AppContent = () => {
   const [appStats, setAppStats] = useState<Record<string, AppStats>>({});
   const [userFavorites, setUserFavorites] = useState<string[]>([]);
 
+  // History State
+  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
+  const [viewingHistoryItem, setViewingHistoryItem] = useState<HistoryItem | null>(null);
+
   useEffect(() => {
       if (isDark) {
           document.documentElement.classList.add('dark');
@@ -67,7 +72,15 @@ const AppContent = () => {
 
     // Load App Stats
     fetchAllAppStats().then(setAppStats);
+
+    // Load History
+    setHistoryItems(HistoryService.getHistory());
   }, [showKeyModal]); // Re-check key when modal closes
+
+  // Refresh history function
+  const refreshHistory = () => {
+    setHistoryItems(HistoryService.getHistory());
+  };
 
   // Function to refresh stats (called after app runs)
   const refreshStats = () => {
@@ -202,7 +215,7 @@ const AppContent = () => {
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div
             className="cursor-pointer group hover:opacity-90 transition-opacity"
-            onClick={() => { setSelectedApp(null); setIsBuilding(false); setEditingRecipe(undefined); }}
+            onClick={() => { setSelectedApp(null); setIsBuilding(false); setEditingRecipe(undefined); setViewingHistoryItem(null); }}
           >
             <Logo />
           </div>
@@ -266,11 +279,14 @@ const AppContent = () => {
                 user={user}
                 customApps={customApps}
                 favoriteApps={favoriteApps}
+                historyItems={historyItems}
                 onSelectApp={setSelectedApp}
                 onCreateNew={() => {
                     setEditingRecipe(undefined);
                     setIsBuilding(true);
                 }}
+                onHistoryItemClick={setViewingHistoryItem}
+                onHistoryUpdate={refreshHistory}
             />
           </div>
         </div>
@@ -293,7 +309,49 @@ const AppContent = () => {
             onRemix={() => handleRemix(selectedApp)}
             onOpenSettings={() => setShowKeyModal(true)}
             onStatsUpdate={refreshStats}
+            onHistoryUpdate={refreshHistory}
           />
+        ) : viewingHistoryItem ? (
+          /* History Image Viewer */
+          <div className="max-w-5xl mx-auto p-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex justify-between items-center mb-6">
+              <button
+                onClick={() => setViewingHistoryItem(null)}
+                className="text-stone-500 dark:text-stone-400 hover:text-black dark:hover:text-white font-medium flex items-center gap-2 transition-colors"
+              >
+                ← Back to Store
+              </button>
+              <div className="flex gap-2">
+                <a
+                  href={viewingHistoryItem.imageData}
+                  download={`${viewingHistoryItem.appName}-${new Date(viewingHistoryItem.createdAt).getTime()}.png`}
+                  className="px-4 py-2 bg-yellow-400 rounded-lg font-bold shadow-sm hover:bg-yellow-300 text-black transition-colors"
+                >
+                  Download
+                </a>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-stone-900 p-2 md:p-4 rounded-2xl shadow-xl border border-stone-200 dark:border-stone-800 transition-colors">
+              <div className="mb-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{viewingHistoryItem.appEmoji}</span>
+                  <div>
+                    <h3 className="font-bold text-stone-900 dark:text-stone-100">{viewingHistoryItem.appName}</h3>
+                    <p className="text-xs text-stone-500">{new Date(viewingHistoryItem.createdAt).toLocaleString()}</p>
+                  </div>
+                </div>
+                <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full font-bold">FROM HISTORY</span>
+              </div>
+              <div className="w-full rounded-xl overflow-hidden relative min-h-[300px] bg-stone-50 dark:bg-stone-950 flex items-center justify-center transition-colors">
+                <img
+                  src={viewingHistoryItem.imageData}
+                  className="w-full h-auto object-contain max-h-[80vh]"
+                  alt="History Result"
+                />
+              </div>
+            </div>
+          </div>
         ) : (
           <MarketplaceView
             customApps={customApps}

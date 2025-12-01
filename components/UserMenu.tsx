@@ -3,18 +3,50 @@ import React, { useState } from 'react';
 import { signInWithGoogle, signOut } from '../services/supabase';
 import { User } from '@supabase/supabase-js';
 import { BananaApp } from '../types';
+import { HistoryItem, HistoryService } from '../services/historyService';
 
 interface UserMenuProps {
     user: User | null;
     customApps: BananaApp[];
     favoriteApps: BananaApp[];
+    historyItems: HistoryItem[];
     onSelectApp: (app: BananaApp) => void;
     onCreateNew: () => void;
+    onHistoryItemClick?: (item: HistoryItem) => void;
+    onHistoryUpdate?: () => void;
 }
 
-const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, onSelectApp, onCreateNew }) => {
+const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, historyItems, onSelectApp, onCreateNew, onHistoryItemClick, onHistoryUpdate }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'recipes' | 'favorites'>('recipes');
+  const [activeTab, setActiveTab] = useState<'recipes' | 'favorites' | 'history'>('recipes');
+
+  const handleDeleteHistoryItem = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    HistoryService.removeFromHistory(id);
+    if (onHistoryUpdate) onHistoryUpdate();
+  };
+
+  const handleClearHistory = () => {
+    if (confirm('Clear all history? This cannot be undone.')) {
+      HistoryService.clearHistory();
+      if (onHistoryUpdate) onHistoryUpdate();
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
+  };
 
   if (!user) {
     return (
@@ -67,27 +99,43 @@ const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, onS
                     <div className="flex border-b border-stone-100 shrink-0">
                         <button
                             onClick={() => setActiveTab('recipes')}
-                            className={`flex-1 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors ${
+                            className={`flex-1 px-2 py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${
                                 activeTab === 'recipes'
                                     ? 'text-stone-900 border-b-2 border-yellow-400 bg-yellow-50'
                                     : 'text-stone-400 hover:text-stone-600 hover:bg-stone-50'
                             }`}
                         >
-                            My Recipes ({customApps.length})
+                            Recipes ({customApps.length})
                         </button>
                         <button
                             onClick={() => setActiveTab('favorites')}
-                            className={`flex-1 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors ${
+                            className={`flex-1 px-2 py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${
                                 activeTab === 'favorites'
                                     ? 'text-stone-900 border-b-2 border-red-400 bg-red-50'
                                     : 'text-stone-400 hover:text-stone-600 hover:bg-stone-50'
                             }`}
                         >
                             <span className="flex items-center justify-center gap-1">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className={activeTab === 'favorites' ? 'text-red-500' : ''}>
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className={activeTab === 'favorites' ? 'text-red-500' : ''}>
                                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                 </svg>
-                                Favorites ({favoriteApps.length})
+                                ({favoriteApps.length})
+                            </span>
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('history')}
+                            className={`flex-1 px-2 py-2 text-[10px] font-bold uppercase tracking-wider transition-colors ${
+                                activeTab === 'history'
+                                    ? 'text-stone-900 border-b-2 border-blue-400 bg-blue-50'
+                                    : 'text-stone-400 hover:text-stone-600 hover:bg-stone-50'
+                            }`}
+                        >
+                            <span className="flex items-center justify-center gap-1">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={activeTab === 'history' ? 'text-blue-500' : ''}>
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                                ({historyItems.length})
                             </span>
                         </button>
                     </div>
@@ -139,7 +187,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, onS
                                     </div>
                                 )}
                             </>
-                        ) : (
+                        ) : activeTab === 'favorites' ? (
                             <>
                                 {favoriteApps.length === 0 ? (
                                     <div className="text-center py-8 px-4 flex flex-col items-center justify-center">
@@ -168,6 +216,77 @@ const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, onS
                                                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                                 </svg>
                                             </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            /* History Tab */
+                            <>
+                                {historyItems.length > 0 && (
+                                    <div className="flex justify-end px-2 mb-2">
+                                        <button
+                                            onClick={handleClearHistory}
+                                            className="text-[10px] text-red-500 hover:text-red-600 hover:bg-red-50 px-2 py-1 rounded transition-colors"
+                                        >
+                                            Clear All
+                                        </button>
+                                    </div>
+                                )}
+
+                                {historyItems.length === 0 ? (
+                                    <div className="text-center py-8 px-4 flex flex-col items-center justify-center">
+                                        <div className="w-16 h-16 bg-stone-50 rounded-full flex items-center justify-center mb-3 text-3xl opacity-50">
+                                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-stone-400">
+                                                <circle cx="12" cy="12" r="10"/>
+                                                <polyline points="12 6 12 12 16 14"/>
+                                            </svg>
+                                        </div>
+                                        <p className="text-xs font-bold text-stone-500">No history yet.</p>
+                                        <p className="text-[10px] text-stone-400 mt-1 text-center leading-relaxed">
+                                            Generated images will appear here.<br/>Up to 20 images saved locally.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {historyItems.map(item => (
+                                            <div
+                                                key={item.id}
+                                                className="relative group cursor-pointer rounded-lg overflow-hidden border border-stone-200 hover:border-blue-400 transition-colors"
+                                                onClick={() => {
+                                                    if (onHistoryItemClick) onHistoryItemClick(item);
+                                                    setIsOpen(false);
+                                                }}
+                                            >
+                                                <img
+                                                    src={item.imageData}
+                                                    alt={item.appName}
+                                                    className="w-full aspect-square object-cover"
+                                                />
+
+                                                {/* Overlay on hover */}
+                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
+                                                    <div className="flex justify-between items-start">
+                                                        <span className="text-lg">{item.appEmoji}</span>
+                                                        <button
+                                                            onClick={(e) => handleDeleteHistoryItem(e, item.id)}
+                                                            className="w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white text-xs transition-colors"
+                                                            title="Delete"
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-white text-[10px] font-bold truncate">{item.appName}</p>
+                                                        <p className="text-white/70 text-[9px]">{formatDate(item.createdAt)}</p>
+                                                    </div>
+                                                </div>
+
+                                                {/* Bottom label always visible */}
+                                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-1.5 group-hover:opacity-0 transition-opacity">
+                                                    <p className="text-white text-[9px] font-medium truncate">{item.appEmoji} {item.appName}</p>
+                                                </div>
+                                            </div>
                                         ))}
                                     </div>
                                 )}

@@ -5,6 +5,7 @@ import { runBananaRecipe, checkApiKey } from '../services/geminiService';
 import BeforeAfterSlider from './BeforeAfterSlider';
 import BananaLoader from './BananaLoader';
 import { incrementUsageCount } from '../services/statsService';
+import { HistoryService } from '../services/historyService';
 
 interface AppRunnerProps {
   app: BananaApp;
@@ -12,9 +13,10 @@ interface AppRunnerProps {
   onRemix: () => void;
   onOpenSettings?: () => void;
   onStatsUpdate?: () => void;
+  onHistoryUpdate?: () => void;
 }
 
-const AppRunner: React.FC<AppRunnerProps> = ({ app, onBack, onRemix, onOpenSettings, onStatsUpdate }) => {
+const AppRunner: React.FC<AppRunnerProps> = ({ app, onBack, onRemix, onOpenSettings, onStatsUpdate, onHistoryUpdate }) => {
   const [inputs, setInputs] = useState<Record<string, string | File>>({});
   const [previews, setPreviews] = useState<Record<string, string>>({});
   
@@ -179,19 +181,22 @@ const AppRunner: React.FC<AppRunnerProps> = ({ app, onBack, onRemix, onOpenSetti
       let foundImage = false;
       const parts = response.candidates?.[0]?.content?.parts;
       
+      let generatedImageData: string | null = null;
+
       if (parts) {
         for (const part of parts) {
           if (part.inlineData && part.inlineData.data) {
              const base64 = part.inlineData.data;
              const mime = part.inlineData.mimeType || 'image/png';
-             setResultImage(`data:${mime};base64,${base64}`);
+             generatedImageData = `data:${mime};base64,${base64}`;
+             setResultImage(generatedImageData);
              foundImage = true;
              break;
           }
         }
       }
 
-      if (!foundImage) {
+      if (!foundImage || !generatedImageData) {
         const text = response.text;
         if (text) {
            throw new Error(`Model returned text instead of image: ${text.substring(0, 100)}...`);
@@ -204,6 +209,22 @@ const AppRunner: React.FC<AppRunnerProps> = ({ app, onBack, onRemix, onOpenSetti
       await incrementUsageCount(app.id);
       if (onStatsUpdate) {
         onStatsUpdate();
+      }
+
+      // Save to local history
+      const primaryInputId = app.inputs.find(i => i.type === 'image')?.id;
+      const inputPreview = primaryInputId ? previews[primaryInputId] : undefined;
+
+      HistoryService.addToHistory({
+        appId: app.id,
+        appName: app.name,
+        appEmoji: app.emoji,
+        imageData: generatedImageData,
+        inputPreview,
+      });
+
+      if (onHistoryUpdate) {
+        onHistoryUpdate();
       }
 
     } catch (err: any) {
