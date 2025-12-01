@@ -46,15 +46,15 @@ export const FLAGSHIP_APPS: BananaApp[] = [
       aspectRatio: 'match_input'
     },
     // 3D Rendered Style Shiba (Clean, Studio Lighting)
-    cover_image: '/apps/pet-toonify-3d/heroic-output-1.png', // Fallback if split fails
+    cover_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/pet-toonify-3d/heroic-output-1.png',
     // Real Shiba Inu
-    example_input_image: '/apps/pet-toonify-3d/input-1.jpeg',
+    example_input_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/pet-toonify-3d/input-1.jpeg',
     // Stylized/Perfect "Result" Look
-    example_output_image: '/apps/pet-toonify-3d/heroic-output-1.png',
+    example_output_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/pet-toonify-3d/heroic-output-1.png',
     additional_images: [
-      { url: '/apps/pet-toonify-3d/dreamy-output-1.png', label: 'Dreamy' },
-      { url: '/apps/pet-toonify-3d/grumpy-output-1.png', label: 'Grumpy' },
-      { url: '/apps/pet-toonify-3d/silly-output-1.png', label: 'Silly' }
+      { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/pet-toonify-3d/dreamy-output-1.png', label: 'Dreamy' },
+      { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/pet-toonify-3d/grumpy-output-1.png', label: 'Grumpy' },
+      { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/pet-toonify-3d/silly-output-1.png', label: 'Silly' }
     ],
     input_tips: [
       "Use photos with good lighting and clear visibility of the face.",
@@ -89,15 +89,15 @@ export const FLAGSHIP_APPS: BananaApp[] = [
       aspectRatio: 'match_input'
     },
     // Abstract Cubist Portrait
-    cover_image: '/apps/picasso-painter/cubism-output-1.png',
+    cover_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/picasso-painter/cubism-output-1.png',
     // Woman Portrait
-    example_input_image: '/apps/picasso-painter/input-1.png',
+    example_input_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/picasso-painter/input-1.png',
     // Abstract Art Result
-    example_output_image: '/apps/picasso-painter/cubism-output-1.png',
+    example_output_image: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/picasso-painter/cubism-output-1.png',
     additional_images: [
-        { url: '/apps/picasso-painter/blue-period-output-1.png', label: 'Blue Period' },
-        { url: '/apps/picasso-painter/rose-period-output-1.png', label: 'Rose Period' },
-        { url: '/apps/picasso-painter/synthetic-cubism-output-1.png', label: 'Synthetic' }
+        { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/picasso-painter/blue-period-output-1.png', label: 'Blue Period' },
+        { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/picasso-painter/rose-period-output-1.png', label: 'Rose Period' },
+        { url: 'https://tahnskaisqiuwswelcmy.supabase.co/storage/v1/object/public/app-images/picasso-painter/synthetic-cubism-output-1.png', label: 'Synthetic' }
     ],
     input_tips: [
       "Works best with portraits or distinct objects.",
