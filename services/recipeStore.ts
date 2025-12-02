@@ -91,5 +91,32 @@ export const RecipeStore = {
       console.error("Failed to fetch community recipes", e);
       return [];
     }
+  },
+
+  /**
+   * Fetches recipes by a specific author name.
+   */
+  fetchRecipesByAuthor: async (authorName: string): Promise<BananaApp[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('recipes')
+        .select('*')
+        .eq('author_name', authorName)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return data.map((row: any) => ({
+        ...row.app_data,
+        id: row.app_data.id,
+        _community: {
+          author: row.author_name,
+          downloads: row.downloads
+        }
+      }));
+    } catch (e) {
+      console.error("Failed to fetch recipes by author", e);
+      return [];
+    }
   }
 };

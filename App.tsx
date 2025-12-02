@@ -9,6 +9,7 @@ import ApiKeyModal from './components/ApiKeyModal';
 import ImportRecipeModal from './components/ImportRecipeModal';
 import MarketplaceView from './components/MarketplaceView';
 import UserMenu from './components/UserMenu';
+import UserProfile from './components/UserProfile';
 import { ToastProvider, useToast } from './components/ToastProvider';
 import { RecipeStore } from './services/recipeStore';
 import { checkApiKey, requestApiKey, isAIStudioAvailable } from './services/geminiService';
@@ -51,6 +52,11 @@ const AppContent = () => {
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [viewingHistoryItem, setViewingHistoryItem] = useState<HistoryItem | null>(null);
 
+  // Profile View State
+  const [viewingProfile, setViewingProfile] = useState<string | null>(null);
+  const [profileRecipes, setProfileRecipes] = useState<BananaApp[]>([]);
+  const [profileFavorites, setProfileFavorites] = useState<BananaApp[]>([]);
+
   useEffect(() => {
       if (isDark) {
           document.documentElement.classList.add('dark');
@@ -80,6 +86,28 @@ const AppContent = () => {
   // Refresh history function
   const refreshHistory = () => {
     setHistoryItems(HistoryService.getHistory());
+  };
+
+  // Handle viewing a user profile
+  const handleViewProfile = async (authorName: string) => {
+    setViewingProfile(authorName);
+    setSelectedApp(null);
+    setIsBuilding(false);
+    setViewingHistoryItem(null);
+
+    // Fetch recipes by this author
+    const recipes = await RecipeStore.fetchRecipesByAuthor(authorName);
+
+    // For "Banana Stand" official, include flagship apps
+    if (authorName === 'Banana Stand') {
+      setProfileRecipes([...FLAGSHIP_APPS, ...recipes]);
+    } else {
+      setProfileRecipes(recipes);
+    }
+
+    // For now, favorites are empty for public profiles (would need public favorites table)
+    // In the future, this could be populated if users opt to make their favorites public
+    setProfileFavorites([]);
   };
 
   // Function to refresh stats (called after app runs)
@@ -215,7 +243,7 @@ const AppContent = () => {
         <div className="max-w-6xl mx-auto flex justify-between items-center gap-2">
           <div
             className="cursor-pointer group hover:opacity-90 transition-opacity shrink-0"
-            onClick={() => { setSelectedApp(null); setIsBuilding(false); setEditingRecipe(undefined); setViewingHistoryItem(null); }}
+            onClick={() => { setSelectedApp(null); setIsBuilding(false); setEditingRecipe(undefined); setViewingHistoryItem(null); setViewingProfile(null); }}
           >
             <Logo />
           </div>
@@ -256,7 +284,7 @@ const AppContent = () => {
                 </button>
             )}
 
-            {!isBuilding && !selectedApp && (
+            {!isBuilding && !selectedApp && !viewingProfile && !viewingHistoryItem && (
               <>
                 <button
                   onClick={handleImport}
@@ -315,6 +343,19 @@ const AppContent = () => {
             onStatsUpdate={refreshStats}
             onHistoryUpdate={refreshHistory}
           />
+        ) : viewingProfile ? (
+          /* User Profile View */
+          <UserProfile
+            authorName={viewingProfile}
+            authorRecipes={profileRecipes}
+            authorFavorites={profileFavorites}
+            onSelectApp={setSelectedApp}
+            onBack={() => setViewingProfile(null)}
+            appStats={appStats}
+            userFavorites={userFavorites}
+            onToggleFavorite={user ? handleToggleFavorite : undefined}
+            onAuthorClick={handleViewProfile}
+          />
         ) : viewingHistoryItem ? (
           /* History Image Viewer */
           <div className="max-w-5xl mx-auto p-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -368,6 +409,7 @@ const AppContent = () => {
             appStats={appStats}
             userFavorites={userFavorites}
             onToggleFavorite={user ? handleToggleFavorite : undefined}
+            onAuthorClick={handleViewProfile}
           />
         )}
       </main>

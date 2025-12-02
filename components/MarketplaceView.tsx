@@ -14,6 +14,7 @@ interface MarketplaceViewProps {
   appStats: Record<string, AppStats>;
   userFavorites: string[];
   onToggleFavorite?: (appId: string) => void;
+  onAuthorClick?: (author: string) => void;
 }
 
 const MarketplaceView: React.FC<MarketplaceViewProps> = ({
@@ -23,7 +24,8 @@ const MarketplaceView: React.FC<MarketplaceViewProps> = ({
   onCreateNew,
   appStats,
   userFavorites,
-  onToggleFavorite
+  onToggleFavorite,
+  onAuthorClick
 }) => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedAuthor, setSelectedAuthor] = useState<string | null>(null);
@@ -195,7 +197,7 @@ const MarketplaceView: React.FC<MarketplaceViewProps> = ({
                   key={app.id}
                   app={app}
                   onClick={onSelectApp}
-                  onAuthorClick={setSelectedAuthor}
+                  onAuthorClick={onAuthorClick || setSelectedAuthor}
                   onTagClick={setSelectedTag}
                   stats={appStats[app.id]}
                   isFavorited={userFavorites.includes(app.id)}
@@ -207,7 +209,7 @@ const MarketplaceView: React.FC<MarketplaceViewProps> = ({
                   key={app.id}
                   app={app}
                   onClick={onSelectApp}
-                  onAuthorClick={setSelectedAuthor}
+                  onAuthorClick={onAuthorClick || setSelectedAuthor}
                   onTagClick={setSelectedTag}
                   stats={appStats[app.id]}
                   isFavorited={userFavorites.includes(app.id)}
