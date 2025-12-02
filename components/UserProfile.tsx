@@ -37,7 +37,6 @@ const UserProfile: React.FC<UserProfileProps> = ({
 
   // Calculate total stats for this author
   const totalRuns = authorRecipes.reduce((sum, app) => sum + (appStats[app.id]?.usage_count ?? 0), 0);
-  const totalFavorites = authorRecipes.reduce((sum, app) => sum + (appStats[app.id]?.favorite_count ?? 0), 0);
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -93,7 +92,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
                 <div className="text-xs font-bold text-stone-400 uppercase tracking-wider">Total Runs</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-black text-red-500">{totalFavorites.toLocaleString()}</div>
+                <div className="text-2xl font-black text-red-500">{authorFavorites.length}</div>
                 <div className="text-xs font-bold text-stone-400 uppercase tracking-wider">Favorites</div>
               </div>
             </div>
