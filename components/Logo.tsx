@@ -63,19 +63,19 @@ export const BananaIcon = ({ size = 48, className = "" }: { size?: number, class
 };
 
 export const Logo = ({ className = "" }: { className?: string }) => (
-  <div className={`flex items-center gap-3 select-none ${className}`}>
+  <div className={`flex items-center gap-2 sm:gap-3 select-none ${className}`}>
     <div className="relative flex-shrink-0 drop-shadow-md hover:scale-105 transition-transform duration-300">
-      <BananaIcon size={56} />
+      <BananaIcon size={40} className="sm:w-14 sm:h-14" />
     </div>
-    <div className="flex flex-col justify-center">
-      <h1 className="font-black text-2xl tracking-tighter leading-none text-stone-900 dark:text-stone-100 transition-colors">
-        THE <span className="text-yellow-500">BANANA</span> STAND
+    <div className="flex flex-col justify-center min-w-0">
+      <h1 className="font-black text-base sm:text-2xl tracking-tighter leading-none text-stone-900 dark:text-stone-100 transition-colors whitespace-nowrap">
+        <span className="hidden xs:inline">THE </span><span className="text-yellow-500">BANANA</span> STAND
       </h1>
-      <div className="flex items-center gap-2">
-        <span className="bg-black text-yellow-400 text-[0.6rem] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
+      <div className="flex items-center gap-1 sm:gap-2">
+        <span className="bg-black text-yellow-400 text-[0.5rem] sm:text-[0.6rem] font-bold px-1 sm:px-1.5 py-0.5 rounded uppercase tracking-wider">
           EST. 2025
         </span>
-        <span className="text-[0.65rem] font-bold text-stone-500 uppercase tracking-widest">
+        <span className="text-[0.5rem] sm:text-[0.65rem] font-bold text-stone-500 uppercase tracking-widest hidden sm:block">
           Nano Banana Pro App Store
         </span>
       </div>
