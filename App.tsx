@@ -89,7 +89,7 @@ const AppContent = () => {
   };
 
   // Handle viewing a user profile
-  const handleViewProfile = async (authorName: string) => {
+  const handleViewProfile = async (authorName: string, isOwnProfile: boolean = false) => {
     setViewingProfile(authorName);
     setSelectedApp(null);
     setIsBuilding(false);
@@ -105,9 +105,17 @@ const AppContent = () => {
       setProfileRecipes(recipes);
     }
 
-    // For now, favorites are empty for public profiles (would need public favorites table)
-    // In the future, this could be populated if users opt to make their favorites public
-    setProfileFavorites([]);
+    // For own profile, show their favorites; for other profiles, empty (would need public favorites feature)
+    if (isOwnProfile) {
+      // Compute favorite apps from the current state
+      const allAppsNow = [...FLAGSHIP_APPS, ...communityApps, ...customApps];
+      const favApps = userFavorites
+        .map(id => allAppsNow.find(app => app.id === id))
+        .filter((app): app is BananaApp => app !== undefined);
+      setProfileFavorites(favApps);
+    } else {
+      setProfileFavorites([]);
+    }
   };
 
   // Function to refresh stats (called after app runs)
@@ -321,7 +329,7 @@ const AppContent = () => {
                 onHistoryUpdate={refreshHistory}
                 onViewProfile={user ? () => {
                     const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
-                    handleViewProfile(userName);
+                    handleViewProfile(userName, true);
                 } : undefined}
             />
           </div>
