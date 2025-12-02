@@ -37,20 +37,20 @@ const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-stone-900 rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-stone-200 dark:border-stone-800 transition-colors">
-        
+    <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-stone-900 rounded-t-3xl sm:rounded-3xl shadow-2xl w-full sm:max-w-md max-h-[90vh] sm:max-h-[85vh] overflow-hidden border-0 sm:border border-stone-200 dark:border-stone-800 transition-colors flex flex-col">
+
         {/* Header */}
-        <div className="bg-stone-900 dark:bg-stone-950 p-6 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+        <div className="bg-stone-900 dark:bg-stone-950 p-4 sm:p-6 flex items-center justify-between shrink-0">
+            <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
                 <span>🔑</span> API Settings
             </h2>
-            <button onClick={onClose} className="text-stone-400 hover:text-white transition-colors">
+            <button onClick={onClose} className="text-stone-400 hover:text-white transition-colors p-1">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1">
             <div className="mb-6">
                 <label className="block text-sm font-bold text-stone-700 dark:text-stone-300 mb-2">Google Gemini API Key</label>
                 <div className="relative">

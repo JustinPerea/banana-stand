@@ -211,44 +211,46 @@ const AppContent = () => {
       </div>
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border-b border-stone-200 dark:border-stone-800 px-6 py-4 shadow-sm transition-colors duration-300">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
+      <header className="sticky top-0 z-50 bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl border-b border-stone-200 dark:border-stone-800 px-3 sm:px-6 py-3 sm:py-4 shadow-sm transition-colors duration-300">
+        <div className="max-w-6xl mx-auto flex justify-between items-center gap-2">
           <div
-            className="cursor-pointer group hover:opacity-90 transition-opacity"
+            className="cursor-pointer group hover:opacity-90 transition-opacity shrink-0"
             onClick={() => { setSelectedApp(null); setIsBuilding(false); setEditingRecipe(undefined); setViewingHistoryItem(null); }}
           >
             <Logo />
           </div>
-          <div className="flex gap-3 items-center">
+          <div className="flex gap-1.5 sm:gap-3 items-center">
             {/* Theme Toggle */}
             <button
                 onClick={() => setIsDark(!isDark)}
-                className="p-2 rounded-full text-stone-500 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-stone-800 transition-colors"
+                className="p-1.5 sm:p-2 rounded-full text-stone-500 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-stone-800 transition-colors"
                 title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
                 {isDark ? (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-5 sm:h-5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
                 ) : (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-5 sm:h-5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 )}
             </button>
 
-            {/* API Key Status Button - Only show if logged in */}
+            {/* API Key Status Button - Only show if logged in, hide text on small screens */}
             {user && (
                 <button
                 onClick={handleKeyClick}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-bold transition-all ${hasKey ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'}`}
+                className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full border text-[10px] sm:text-xs font-bold transition-all ${hasKey ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'}`}
                 title={isAIStudioAvailable() ? "Select Google Project" : "Manage API Key"}
                 >
                 {hasKey ? (
                     <>
                     <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    KEY ACTIVE
+                    <span className="hidden sm:inline">KEY ACTIVE</span>
+                    <span className="sm:hidden">KEY</span>
                     </>
                 ) : (
                     <>
                     <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                    SET KEY
+                    <span className="hidden sm:inline">SET KEY</span>
+                    <span className="sm:hidden">KEY</span>
                     </>
                 )}
                 </button>
@@ -267,14 +269,16 @@ const AppContent = () => {
                     setEditingRecipe(undefined);
                     setIsBuilding(true);
                   }}
-                  className="bg-stone-900 text-white font-bold px-5 py-2.5 rounded-full hover:bg-stone-800 transition-all shadow-lg hover:shadow-xl active:scale-95 text-sm flex items-center gap-2"
+                  className="bg-stone-900 text-white font-bold px-3 sm:px-5 py-2 sm:py-2.5 rounded-full hover:bg-stone-800 transition-all shadow-lg hover:shadow-xl active:scale-95 text-xs sm:text-sm flex items-center gap-1 sm:gap-2"
                 >
-                  <span className="text-lg">🔨</span> Build a Recipe
+                  <span className="text-base sm:text-lg">🔨</span>
+                  <span className="hidden sm:inline">Build a Recipe</span>
+                  <span className="sm:hidden">Build</span>
                 </button>
               </>
             )}
-            
-            <div className="h-6 w-px bg-stone-200 mx-1 hidden md:block"></div>
+
+            <div className="h-6 w-px bg-stone-200 mx-0.5 sm:mx-1 hidden sm:block"></div>
             <UserMenu
                 user={user}
                 customApps={customApps}
@@ -293,7 +297,7 @@ const AppContent = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-6 pt-8">
+      <main className="max-w-6xl mx-auto px-3 sm:px-6 pt-4 sm:pt-8">
 
         {isBuilding ? (
           <RecipeBuilder

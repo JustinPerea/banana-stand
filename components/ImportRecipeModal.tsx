@@ -52,20 +52,20 @@ const ImportRecipeModal: React.FC<ImportRecipeModalProps> = ({ onClose, onImport
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-stone-900 rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-stone-200 dark:border-stone-800 flex flex-col max-h-[90vh] transition-colors">
-        
+    <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-stone-900 rounded-t-3xl sm:rounded-3xl shadow-2xl w-full sm:max-w-2xl overflow-hidden border-0 sm:border border-stone-200 dark:border-stone-800 flex flex-col max-h-[90vh] sm:max-h-[85vh] transition-colors">
+
         {/* Header */}
-        <div className="bg-stone-900 dark:bg-stone-950 p-6 flex items-center justify-between shrink-0">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+        <div className="bg-stone-900 dark:bg-stone-950 p-4 sm:p-6 flex items-center justify-between shrink-0">
+            <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
                 <span>📥</span> Import Recipe
             </h2>
-            <button onClick={onClose} className="text-stone-400 hover:text-white transition-colors">
+            <button onClick={onClose} className="text-stone-400 hover:text-white transition-colors p-1">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
 
-        <div className="p-6 flex flex-col gap-4 overflow-hidden flex-1">
+        <div className="p-4 sm:p-6 flex flex-col gap-4 overflow-hidden flex-1">
             <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 p-4 rounded-xl text-sm text-yellow-800 dark:text-yellow-200 transition-colors">
                 Paste the JSON code of a shared recipe below to add it to your collection.
             </div>
@@ -74,7 +74,7 @@ const ImportRecipeModal: React.FC<ImportRecipeModalProps> = ({ onClose, onImport
                 value={jsonContent}
                 onChange={(e) => setJsonContent(e.target.value)}
                 placeholder='{ "id": "...", "name": "...", ... }'
-                className="w-full flex-1 min-h-[300px] p-4 bg-stone-50 dark:bg-stone-950 dark:text-white border border-stone-300 dark:border-stone-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 font-mono text-sm resize-none transition-colors"
+                className="w-full flex-1 min-h-[200px] sm:min-h-[300px] p-3 sm:p-4 bg-stone-50 dark:bg-stone-950 dark:text-white border border-stone-300 dark:border-stone-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 font-mono text-xs sm:text-sm resize-none transition-colors"
             />
             
             {error && (

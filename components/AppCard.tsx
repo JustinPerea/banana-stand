@@ -16,6 +16,34 @@ interface AppCardProps {
 
 const AppCard: React.FC<AppCardProps> = ({ app, onClick, onAuthorClick, onTagClick, stats, isFavorited, onToggleFavorite }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && gallery.length > 1) {
+      setCurrentImageIndex((prev) => (prev + 1) % gallery.length);
+    }
+    if (isRightSwipe && gallery.length > 1) {
+      setCurrentImageIndex((prev) => (prev - 1 + gallery.length) % gallery.length);
+    }
+  };
 
   // Use real stats from database, fall back to 0 if not available
   const usageCount = stats?.usage_count ?? 0;
@@ -81,51 +109,56 @@ const AppCard: React.FC<AppCardProps> = ({ app, onClick, onAuthorClick, onTagCli
                  hover:-translate-y-1 hover:border-black dark:hover:border-stone-400 hover:shadow-[6px_6px_0px_0px_#FACC15] dark:hover:shadow-[6px_6px_0px_0px_#78350F]"
     >
       {/* --- Image Section --- */}
-      <div className="relative h-64 w-full overflow-hidden rounded-t-[14px] border-b-2 border-stone-100 dark:border-stone-800 group-hover:border-stone-900 dark:group-hover:border-stone-500 transition-colors bg-stone-100 dark:bg-stone-800">
+      <div
+        className="relative h-64 w-full overflow-hidden rounded-t-[14px] border-b-2 border-stone-100 dark:border-stone-800 group-hover:border-stone-900 dark:group-hover:border-stone-500 transition-colors bg-stone-100 dark:bg-stone-800"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
         
         {currentItem.type === 'split' && currentItem.otherUrl ? (
-            <div className="relative w-full h-full flex">
-                {/* Left Half (Input) */}
-                <div className="relative w-1/2 h-full border-r border-white/20 overflow-hidden flex flex-col">
+            <div className="relative w-full h-full flex flex-col sm:flex-row">
+                {/* Left/Top Half (Input) */}
+                <div className="relative w-full sm:w-1/2 h-1/2 sm:h-full border-b sm:border-b-0 sm:border-r border-white/20 overflow-hidden flex flex-col">
                     {Array.isArray(currentItem.otherUrl) ? (
                         <>
                             <div className="h-1/2 w-full relative border-b border-white/20">
-                                <img 
-                                    src={currentItem.otherUrl[0]} 
+                                <img
+                                    src={currentItem.otherUrl[0]}
                                     alt="Before 1"
-                                    className="w-full h-full object-cover" 
+                                    className="w-full h-full object-cover"
                                 />
                             </div>
                             <div className="h-1/2 w-full relative">
-                                <img 
-                                    src={currentItem.otherUrl[1]} 
+                                <img
+                                    src={currentItem.otherUrl[1]}
                                     alt="Before 2"
-                                    className="w-full h-full object-cover" 
+                                    className="w-full h-full object-cover"
                                 />
                             </div>
                         </>
                     ) : (
-                        <img 
-                            src={currentItem.otherUrl} 
+                        <img
+                            src={currentItem.otherUrl}
                             alt="Before"
-                            className="w-full h-full object-cover" 
+                            className="w-full h-full object-cover"
                         />
                     )}
-                    <div className="absolute bottom-2 left-2 bg-black/60 text-white text-[9px] font-bold px-2 py-1 rounded-md backdrop-blur-md shadow-sm">ORIGINAL</div>
+                    <div className="absolute bottom-1 sm:bottom-2 left-1 sm:left-2 bg-black/60 text-white text-[8px] sm:text-[9px] font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md backdrop-blur-md shadow-sm">ORIGINAL</div>
                 </div>
-                {/* Right Half (Output) */}
-                <div className="relative w-1/2 h-full overflow-hidden">
-                    <img 
-                        src={currentItem.url} 
+                {/* Right/Bottom Half (Output) */}
+                <div className="relative w-full sm:w-1/2 h-1/2 sm:h-full overflow-hidden">
+                    <img
+                        src={currentItem.url}
                         alt="After"
                         className="w-full h-full object-cover"
                     />
-                    <div className="absolute bottom-2 right-2 bg-yellow-400 text-black text-[9px] font-bold px-2 py-1 rounded-md shadow-sm">REMIX</div>
+                    <div className="absolute bottom-1 sm:bottom-2 right-1 sm:right-2 bg-yellow-400 text-black text-[8px] sm:text-[9px] font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md shadow-sm">REMIX</div>
                 </div>
-                
+
                 {/* Center Icon */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg z-30 border-2 border-stone-100">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-stone-900"><path d="M5 12h14m-4 4l4-4-4-4"/></svg>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 sm:w-8 sm:h-8 bg-white rounded-full flex items-center justify-center shadow-lg z-30 border-2 border-stone-100">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-stone-900 sm:w-[14px] sm:h-[14px] rotate-90 sm:rotate-0"><path d="M5 12h14m-4 4l4-4-4-4"/></svg>
                 </div>
             </div>
         ) : (
@@ -143,30 +176,30 @@ const AppCard: React.FC<AppCardProps> = ({ app, onClick, onAuthorClick, onTagCli
         {/* Navigation Arrows (Only if multiple images) */}
         {gallery.length > 1 && (
             <>
-                {/* Left Arrow */}
-                <button 
+                {/* Left Arrow - visible on mobile, hover on desktop */}
+                <button
                     onClick={handlePrev}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 hover:bg-white text-black rounded-full flex items-center justify-center shadow-md backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity z-30 hover:scale-110 active:scale-95"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 hover:bg-white text-black rounded-full flex items-center justify-center shadow-md backdrop-blur-sm opacity-70 md:opacity-0 md:group-hover:opacity-100 transition-opacity z-30 hover:scale-110 active:scale-95"
                     title="Previous Image"
                 >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </button>
 
-                {/* Right Arrow */}
-                <button 
+                {/* Right Arrow - visible on mobile, hover on desktop */}
+                <button
                     onClick={handleNext}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 hover:bg-white text-black rounded-full flex items-center justify-center shadow-md backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity z-30 hover:scale-110 active:scale-95"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 hover:bg-white text-black rounded-full flex items-center justify-center shadow-md backdrop-blur-sm opacity-70 md:opacity-0 md:group-hover:opacity-100 transition-opacity z-30 hover:scale-110 active:scale-95"
                     title="Next Image"
                 >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </button>
-                
-                {/* Dots Indicator */}
+
+                {/* Dots Indicator - always visible, indicates swipeable */}
                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20 pointer-events-none">
                     {gallery.map((_, idx) => (
-                        <div 
-                            key={idx} 
-                            className={`w-1.5 h-1.5 rounded-full shadow-sm transition-colors ${idx === currentImageIndex ? 'bg-white scale-125' : 'bg-white/50'}`}
+                        <div
+                            key={idx}
+                            className={`w-2 h-2 md:w-1.5 md:h-1.5 rounded-full shadow-sm transition-all ${idx === currentImageIndex ? 'bg-white scale-125' : 'bg-white/50'}`}
                         />
                     ))}
                  </div>

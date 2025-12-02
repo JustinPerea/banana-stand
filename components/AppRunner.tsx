@@ -28,6 +28,34 @@ const AppRunner: React.FC<AppRunnerProps> = ({ app, onBack, onRemix, onOpenSetti
 
   // Header Carousel State
   const [currentHeaderIndex, setCurrentHeaderIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && headerGallery.length > 1) {
+      setCurrentHeaderIndex((prev) => (prev + 1) % headerGallery.length);
+    }
+    if (isRightSwipe && headerGallery.length > 1) {
+      setCurrentHeaderIndex((prev) => (prev - 1 + headerGallery.length) % headerGallery.length);
+    }
+  };
 
   // Construct header gallery (Main Result + Additional Images)
   const headerGallery = React.useMemo(() => {
@@ -343,81 +371,86 @@ const AppRunner: React.FC<AppRunnerProps> = ({ app, onBack, onRemix, onOpenSetti
 
         {/* --- Header Split Preview --- */}
         {app.example_input_image && headerGallery.length > 0 && (
-            <div className="mb-8 rounded-xl overflow-hidden shadow-sm border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800">
-                <div className="relative w-full h-64 md:h-80 flex">
-                    {/* Left Half (Input) */}
-                    <div className="relative w-1/2 h-full border-r border-white/20 overflow-hidden flex flex-col">
+            <div className="mb-6 sm:mb-8 rounded-xl overflow-hidden shadow-sm border border-stone-200 dark:border-stone-800 bg-stone-100 dark:bg-stone-800">
+                <div className="relative w-full h-48 sm:h-64 md:h-80 flex flex-col sm:flex-row">
+                    {/* Left/Top Half (Input) */}
+                    <div className="relative w-full sm:w-1/2 h-1/2 sm:h-full border-b sm:border-b-0 sm:border-r border-white/20 overflow-hidden flex flex-col">
                         {Array.isArray(app.example_input_image) ? (
                             <>
                                 <div className="h-1/2 w-full relative border-b border-white/20">
-                                    <img 
-                                        src={app.example_input_image[0]} 
+                                    <img
+                                        src={app.example_input_image[0]}
                                         alt="Example Input 1"
-                                        className="w-full h-full object-cover" 
+                                        className="w-full h-full object-cover"
                                     />
                                 </div>
                                 <div className="h-1/2 w-full relative">
-                                    <img 
-                                        src={app.example_input_image[1]} 
+                                    <img
+                                        src={app.example_input_image[1]}
                                         alt="Example Input 2"
-                                        className="w-full h-full object-cover" 
+                                        className="w-full h-full object-cover"
                                     />
                                 </div>
                             </>
                         ) : (
-                            <img 
-                                src={app.example_input_image} 
+                            <img
+                                src={app.example_input_image}
                                 alt="Example Input"
-                                className="w-full h-full object-cover" 
+                                className="w-full h-full object-cover"
                             />
                         )}
-                        <div className="absolute bottom-2 left-2 bg-black/60 text-white text-[9px] font-bold px-2 py-1 rounded-md backdrop-blur-md shadow-sm z-10">ORIGINAL</div>
+                        <div className="absolute bottom-1 sm:bottom-2 left-1 sm:left-2 bg-black/60 text-white text-[8px] sm:text-[9px] font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md backdrop-blur-md shadow-sm z-10">ORIGINAL</div>
                     </div>
                     
-                    {/* Right Half (Output Carousel) */}
-                    <div className="relative w-1/2 h-full overflow-hidden group">
-                        <img 
+                    {/* Right/Bottom Half (Output Carousel) */}
+                    <div
+                        className="relative w-full sm:w-1/2 h-1/2 sm:h-full overflow-hidden group"
+                        onTouchStart={onTouchStart}
+                        onTouchMove={onTouchMove}
+                        onTouchEnd={onTouchEnd}
+                    >
+                        <img
                             key={currentHeaderItem.url}
-                            src={currentHeaderItem.url} 
+                            src={currentHeaderItem.url}
                             alt="Example Output"
                             className="w-full h-full object-cover animate-in fade-in duration-300"
                         />
-                        <div className="absolute bottom-2 right-2 bg-yellow-400 text-black text-[9px] font-bold px-2 py-1 rounded-md shadow-sm z-10 uppercase">
+                        <div className="absolute bottom-1 sm:bottom-2 right-1 sm:right-2 bg-yellow-400 text-black text-[8px] sm:text-[9px] font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md shadow-sm z-10 uppercase">
                             {currentHeaderItem.label || 'RESULT'}
                         </div>
 
-                        {/* Navigation Arrows */}
+                        {/* Navigation Arrows - visible on mobile, hover on desktop */}
                         {headerGallery.length > 1 && (
                             <>
-                                <button 
+                                <button
                                     onClick={(e) => { e.stopPropagation(); handleHeaderPrev(); }}
-                                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/30 hover:bg-black/60 text-white rounded-full flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all z-20"
+                                    className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 w-6 h-6 sm:w-8 sm:h-8 bg-black/30 hover:bg-black/60 text-white rounded-full flex items-center justify-center backdrop-blur-sm opacity-70 md:opacity-0 md:group-hover:opacity-100 transition-all z-20"
                                 >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="sm:w-4 sm:h-4"><polyline points="15 18 9 12 15 6"></polyline></svg>
                                 </button>
-                                <button 
+                                <button
                                     onClick={(e) => { e.stopPropagation(); handleHeaderNext(); }}
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/30 hover:bg-black/60 text-white rounded-full flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all z-20"
+                                    className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 w-6 h-6 sm:w-8 sm:h-8 bg-black/30 hover:bg-black/60 text-white rounded-full flex items-center justify-center backdrop-blur-sm opacity-70 md:opacity-0 md:group-hover:opacity-100 transition-all z-20"
                                 >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="sm:w-4 sm:h-4"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 </button>
-                                
-                                {/* Dots */}
-                                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20 pointer-events-none">
+
+                                {/* Dots - larger on mobile */}
+                                <div className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 flex gap-1 sm:gap-1.5 z-20 pointer-events-none">
                                     {headerGallery.map((_, idx) => (
-                                        <div 
-                                            key={idx} 
-                                            className={`w-1.5 h-1.5 rounded-full shadow-sm transition-colors ${idx === currentHeaderIndex ? 'bg-white scale-125' : 'bg-white/40'}`}
+                                        <div
+                                            key={idx}
+                                            className={`w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-1.5 md:h-1.5 rounded-full shadow-sm transition-all ${idx === currentHeaderIndex ? 'bg-white scale-125' : 'bg-white/40'}`}
                                         />
                                     ))}
                                 </div>
                             </>
                         )}
                     </div>
-                    
+
                     {/* Center Icon */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg z-30 border-2 border-stone-100">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-stone-900"><path d="M5 12h14m-4 4l4-4-4-4"/></svg>
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 sm:w-8 sm:h-8 bg-white rounded-full flex items-center justify-center shadow-lg z-30 border-2 border-stone-100">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-stone-900 sm:w-[14px] sm:h-[14px] rotate-90 sm:rotate-0"><path d="M5 12h14m-4 4l4-4-4-4"/></svg>
                     </div>
                 </div>
             </div>
@@ -617,7 +650,7 @@ const AppRunner: React.FC<AppRunnerProps> = ({ app, onBack, onRemix, onOpenSetti
         </div>
 
         {/* Sticky Action Bar for Mobile */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-stone-900/90 backdrop-blur-lg border-t border-stone-200 dark:border-stone-800 md:hidden z-40 flex items-center justify-between gap-4">
+        <div className="fixed bottom-0 left-0 right-0 p-4 safe-bottom bg-white/90 dark:bg-stone-900/90 backdrop-blur-lg border-t border-stone-200 dark:border-stone-800 md:hidden z-40 flex items-center justify-between gap-4">
              <div className="flex flex-col">
                 <span className="text-[10px] font-bold uppercase text-stone-400">Ready?</span>
                 <span className="text-xs font-bold text-stone-900 dark:text-white truncate max-w-[120px]">{app.name}</span>

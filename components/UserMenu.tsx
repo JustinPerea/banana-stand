@@ -86,13 +86,27 @@ const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, his
                 {/* Backdrop to close */}
                 <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)}></div>
                 
-                {/* Dropdown */}
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-stone-200 z-20 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
+                {/* Dropdown - full screen on mobile, dropdown on desktop */}
+                <div className="fixed sm:absolute inset-0 sm:inset-auto sm:right-0 sm:mt-2 w-full sm:w-72 bg-white rounded-none sm:rounded-xl shadow-xl border-0 sm:border border-stone-200 z-20 overflow-hidden animate-in fade-in sm:zoom-in-95 duration-200 flex flex-col h-full sm:h-auto sm:max-h-[80vh]">
                     <div className="p-4 border-b border-stone-100 bg-stone-50 shrink-0">
-                        <p className="text-xs font-bold text-stone-900 truncate">
-                            {user.user_metadata?.full_name || 'User'}
-                        </p>
-                        <p className="text-[10px] text-stone-500 truncate">{user.email}</p>
+                        <div className="flex items-center justify-between">
+                            <div className="min-w-0 flex-1">
+                                <p className="text-sm sm:text-xs font-bold text-stone-900 truncate">
+                                    {user.user_metadata?.full_name || 'User'}
+                                </p>
+                                <p className="text-xs sm:text-[10px] text-stone-500 truncate">{user.email}</p>
+                            </div>
+                            {/* Close button - visible on mobile */}
+                            <button
+                                onClick={() => setIsOpen(false)}
+                                className="sm:hidden ml-2 p-2 -mr-2 text-stone-400 hover:text-stone-600 transition-colors"
+                            >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     {/* Tab Switcher */}
@@ -248,7 +262,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, his
                                         </p>
                                     </div>
                                 ) : (
-                                    <div className="grid grid-cols-2 gap-2">
+                                    <div className="grid grid-cols-3 sm:grid-cols-2 gap-2 sm:gap-2">
                                         {historyItems.map(item => (
                                             <div
                                                 key={item.id}

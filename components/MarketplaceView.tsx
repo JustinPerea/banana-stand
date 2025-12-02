@@ -77,28 +77,28 @@ const MarketplaceView: React.FC<MarketplaceViewProps> = ({
   return (
     <div className="animate-in fade-in duration-500">
       {/* Hero Section */}
-      <div className="relative mb-8 text-center max-w-3xl mx-auto py-12">
+      <div className="relative mb-6 sm:mb-8 text-center max-w-3xl mx-auto py-8 sm:py-12">
         <FallingBananas />
         <div className="relative z-10">
-          <div className="inline-block bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full mb-4 border border-yellow-200">
+          <div className="inline-block bg-yellow-100 text-yellow-800 text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1 rounded-full mb-3 sm:mb-4 border border-yellow-200">
             BETA • GEMINI 3 PRO ENABLED
           </div>
-        <h2 className="text-4xl md:text-6xl font-black text-stone-900 dark:text-stone-100 mb-6 tracking-tight leading-tight transition-colors">
-          Build & Discover <br className="hidden md:block" />
+        <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-stone-900 dark:text-stone-100 mb-4 sm:mb-6 tracking-tight leading-tight transition-colors">
+          Build & Discover <br className="hidden sm:block" />
           <span className="relative inline-block">
             <span className="relative z-10">AI Image Apps.</span>
-            <span className="absolute bottom-2 left-0 w-full h-3 bg-yellow-400 -rotate-1 z-0 opacity-60 mix-blend-multiply dark:mix-blend-normal"></span>
+            <span className="absolute bottom-1 sm:bottom-2 left-0 w-full h-2 sm:h-3 bg-yellow-400 -rotate-1 z-0 opacity-60 mix-blend-multiply dark:mix-blend-normal"></span>
           </span>
         </h2>
-        <p className="text-lg md:text-xl text-stone-600 dark:text-stone-400 font-medium max-w-2xl mx-auto leading-relaxed transition-colors">
-          The community marketplace for Gemini 3 Pro "Recipes." <br className="hidden md:block" />
+        <p className="text-base sm:text-lg md:text-xl text-stone-600 dark:text-stone-400 font-medium max-w-2xl mx-auto leading-relaxed transition-colors px-2">
+          The community marketplace for Gemini 3 Pro "Recipes." <br className="hidden sm:block" />
           Turn your prompts into shareable micro-apps that transform any photo in seconds.
         </p>
         </div>
       </div>
 
-      {/* Category Menu */}
-      <div className="sticky top-[73px] z-40 bg-stone-50/95 dark:bg-stone-950/95 backdrop-blur-sm py-4 mb-8 -mx-6 px-6 border-b border-stone-200 dark:border-stone-800 transition-colors">
+      {/* Category Menu - adjust top offset for mobile header */}
+      <div className="sticky top-[57px] sm:top-[73px] z-40 bg-stone-50/95 dark:bg-stone-950/95 backdrop-blur-sm py-3 sm:py-4 mb-6 sm:mb-8 -mx-3 sm:-mx-6 px-3 sm:px-6 border-b border-stone-200 dark:border-stone-800 transition-colors">
         <div className="max-w-6xl mx-auto flex flex-col gap-4">
             
             {/* Active Filters Bar */}
@@ -189,7 +189,7 @@ const MarketplaceView: React.FC<MarketplaceViewProps> = ({
                </button>
              </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
               {filteredCommunityApps.map((app) => (
                 <AppCard
                   key={app.id}
