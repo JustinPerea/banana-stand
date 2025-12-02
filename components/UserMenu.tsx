@@ -87,7 +87,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, his
                 <div className="fixed inset-0 z-[99] bg-black/50 sm:bg-transparent" onClick={() => setIsOpen(false)}></div>
 
                 {/* Dropdown - full screen on mobile, dropdown on desktop */}
-                <div className="fixed inset-0 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 w-full sm:w-72 bg-white dark:bg-stone-900 rounded-none sm:rounded-xl shadow-xl border-0 sm:border border-stone-200 dark:border-stone-700 z-[100] overflow-hidden animate-in fade-in slide-in-from-bottom sm:slide-in-from-top-2 sm:zoom-in-95 duration-200 flex flex-col h-full sm:h-auto sm:max-h-[80vh]">
+                <div className="fixed top-0 left-0 right-0 bottom-0 sm:absolute sm:top-full sm:left-auto sm:right-0 sm:bottom-auto sm:mt-2 w-full sm:w-72 bg-white dark:bg-stone-900 rounded-none sm:rounded-xl shadow-xl border-0 sm:border border-stone-200 dark:border-stone-700 z-[100] overflow-hidden animate-in fade-in slide-in-from-bottom sm:slide-in-from-top-2 sm:zoom-in-95 duration-200 flex flex-col sm:h-auto sm:max-h-[80vh]">
                     <div className="p-4 border-b border-stone-100 dark:border-stone-800 bg-stone-50 dark:bg-stone-950 shrink-0 safe-top">
                         <div className="flex items-center justify-between">
                             <div className="min-w-0 flex-1">
