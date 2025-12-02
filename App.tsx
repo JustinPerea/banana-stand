@@ -319,6 +319,10 @@ const AppContent = () => {
                 }}
                 onHistoryItemClick={setViewingHistoryItem}
                 onHistoryUpdate={refreshHistory}
+                onViewProfile={user ? () => {
+                    const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
+                    handleViewProfile(userName);
+                } : undefined}
             />
           </div>
         </div>

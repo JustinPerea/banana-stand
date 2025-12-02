@@ -15,9 +15,10 @@ interface UserMenuProps {
     onCreateNew: () => void;
     onHistoryItemClick?: (item: HistoryItem) => void;
     onHistoryUpdate?: () => void;
+    onViewProfile?: () => void;
 }
 
-const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, historyItems, onSelectApp, onCreateNew, onHistoryItemClick, onHistoryUpdate }) => {
+const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, historyItems, onSelectApp, onCreateNew, onHistoryItemClick, onHistoryUpdate, onViewProfile }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'recipes' | 'favorites' | 'history'>('recipes');
   const [isMobile, setIsMobile] = useState(false);
@@ -318,7 +319,22 @@ const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, his
                                 )}
                             </div>
 
-                            <div className="border-t border-stone-100 dark:border-stone-800 p-2 shrink-0 safe-bottom">
+                            <div className="border-t border-stone-100 dark:border-stone-800 p-2 shrink-0 safe-bottom space-y-1">
+                                {onViewProfile && (
+                                    <button
+                                        onClick={() => {
+                                            onViewProfile();
+                                            setIsOpen(false);
+                                        }}
+                                        className="w-full text-left px-4 py-4 text-base text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 font-medium transition-colors rounded-lg flex items-center gap-3"
+                                    >
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                        View My Profile
+                                    </button>
+                                )}
                                 <button
                                     onClick={() => {
                                         signOut();
@@ -543,7 +559,22 @@ const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, his
                                 )}
                             </div>
 
-                            <div className="border-t border-stone-100 dark:border-stone-800 p-1 shrink-0">
+                            <div className="border-t border-stone-100 dark:border-stone-800 p-1 shrink-0 space-y-0.5">
+                                {onViewProfile && (
+                                    <button
+                                        onClick={() => {
+                                            onViewProfile();
+                                            setIsOpen(false);
+                                        }}
+                                        className="w-full text-left px-4 py-3 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 font-medium transition-colors rounded-lg flex items-center gap-2"
+                                    >
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                        View My Profile
+                                    </button>
+                                )}
                                 <button
                                     onClick={() => {
                                         signOut();
