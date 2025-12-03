@@ -7,6 +7,7 @@ import Logo from './components/Logo';
 import BananaCharacter from './components/BananaCharacter';
 import ApiKeyModal from './components/ApiKeyModal';
 import ImportRecipeModal from './components/ImportRecipeModal';
+import TestPromptModal from './components/TestPromptModal';
 import MarketplaceView from './components/MarketplaceView';
 import UserMenu from './components/UserMenu';
 import UserProfile from './components/UserProfile';
@@ -32,6 +33,7 @@ const AppContent = () => {
   // Key Management State
   const [showKeyModal, setShowKeyModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showTestPromptModal, setShowTestPromptModal] = useState(false);
   const [hasKey, setHasKey] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   
@@ -295,8 +297,14 @@ const AppContent = () => {
             {!isBuilding && !selectedApp && !viewingProfile && !viewingHistoryItem && (
               <>
                 <button
+                  onClick={() => setShowTestPromptModal(true)}
+                  className="text-stone-500 font-bold px-4 py-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-all text-sm hidden md:block"
+                >
+                  🧪 Test
+                </button>
+                <button
                   onClick={handleImport}
-                  className="text-stone-500 font-bold px-4 py-2 rounded-full hover:bg-stone-100 transition-all text-sm hidden md:block"
+                  className="text-stone-500 font-bold px-4 py-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-all text-sm hidden md:block"
                 >
                   📥 Import
                 </button>
@@ -439,10 +447,13 @@ const AppContent = () => {
 
       {showKeyModal && <ApiKeyModal onClose={() => setShowKeyModal(false)} />}
       {showImportModal && (
-        <ImportRecipeModal 
-          onClose={() => setShowImportModal(false)} 
-          onImport={onImportRecipe} 
+        <ImportRecipeModal
+          onClose={() => setShowImportModal(false)}
+          onImport={onImportRecipe}
         />
+      )}
+      {showTestPromptModal && (
+        <TestPromptModal onClose={() => setShowTestPromptModal(false)} />
       )}
     </div>
   );
