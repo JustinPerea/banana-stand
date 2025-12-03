@@ -359,13 +359,13 @@ export const FLAGSHIP_APPS: BananaApp[] = [
     tags: ['Business', 'E-commerce', 'Ads'],
     usage_count: 4210,
     tagline: 'Professional product photography in seconds.',
-    description: 'Turn simple phone photos of your products into high-end marketing assets. This app removes the background from your product and places it into a professional scene of your choice—perfect for Instagram, Shopify, or pitch decks.',
+    description: 'Turn simple phone photos of your products into high-end marketing assets. This app removes the background from your product and places it into a professional scene of your choice—or let AI pick the perfect backdrop based on your product.',
     inputs: [
       { id: 'product_image', type: 'image', label: 'Product Photo' },
-      { id: 'scene', type: 'select', label: 'Scene Setting', options: ['Minimal Studio', 'Lifestyle Kitchen', 'Outdoor Nature', 'Luxury Podium', 'Neon Cyberpunk', 'Cozy Living Room'] }
+      { id: 'scene', type: 'select', label: 'Scene Setting', options: ['✨ Smart Match (AI Picks)', 'Minimal Studio', 'Lifestyle Kitchen', 'Outdoor Nature', 'Luxury Podium', 'Neon Cyberpunk', 'Cozy Living Room'] }
     ],
-    system_instruction: 'You are a professional Product Photographer and Retoucher. You specialize in compositing products into realistic environments with perfect lighting matching.',
-    master_prompt: 'Take the main product object from {{product_image}} and place it into a {{scene}}. The product should be the clear focal point. Ensure the lighting, shadows, and reflections on the product match the new environment perfectly. The result should look like a high-budget commercial photoshoot.',
+    system_instruction: 'You are a professional Product Photographer, Creative Director, and Retoucher. You specialize in compositing products into realistic environments with perfect lighting matching. You have an exceptional eye for understanding what environments and backdrops best complement specific products to create compelling marketing imagery.',
+    master_prompt: 'Take the main product object from {{product_image}} and place it into a scene based on "{{scene}}". If the scene is "✨ Smart Match (AI Picks)", you must FIRST analyze the product to identify what it is, its colors, materials, brand personality, and target audience. Then creatively design the PERFECT contextual backdrop that tells a story about this specific product. Examples: a spray paint can with artistic paint splatters as backdrop, a banana in a lush jungle setting, a watch on volcanic rock with dramatic lighting, skincare surrounded by natural ingredients. Be creative and product-specific! Otherwise, use the specified scene setting directly. The product should be the clear focal point. Ensure the lighting, shadows, and reflections on the product match the new environment perfectly. The result should look like a high-budget commercial photoshoot.',
     model_config: {
       temperature: 0.7,
       thinking_mode: false,
@@ -384,12 +384,14 @@ export const FLAGSHIP_APPS: BananaApp[] = [
     input_tips: [
       "Photograph your product against a plain background.",
       "Ensure even lighting on the product.",
-      "Avoid cutting off any part of the product."
+      "Avoid cutting off any part of the product.",
+      "Try 'Smart Match' for AI-suggested creative backdrops!"
     ],
     output_expectations: [
       "The product isolated and placed in a new scene.",
       "Realistic shadows cast by the product.",
-      "High-quality background blending."
+      "High-quality background blending.",
+      "Smart Match: A contextually creative backdrop tailored to your product."
     ]
   }
 ];
