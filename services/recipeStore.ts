@@ -102,6 +102,12 @@ export const RecipeStore = {
         });
 
       if (error) throw error;
+
+      // Invalidate cache so the new recipe shows up
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('banana_stand_community_cache');
+      }
+
       return true;
     } catch (e) {
       console.error("Failed to publish recipe", e);
@@ -110,30 +116,76 @@ export const RecipeStore = {
   },
 
   /**
-   * Fetches recipes from the Community.
+   * Fetches recipes from the Community with caching.
    */
   fetchCommunityRecipes: async (): Promise<BananaApp[]> => {
+    const CACHE_KEY = 'banana_stand_community_cache';
+    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
     try {
-      const { data, error } = await supabase
-        .from('recipes')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (error) throw error;
-
-      return data.map((row: any) => ({
-        ...row.app_data,
-        id: row.app_data.id, // Ensure ID matches
-        author: row.author_name, // Set author from database
-        _community: {
-          author: row.author_name,
-          downloads: row.downloads
+      // Check cache first
+      if (typeof window !== 'undefined') {
+        const cached = sessionStorage.getItem(CACHE_KEY);
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < CACHE_DURATION) {
+            // Return cached data immediately, but refresh in background
+            RecipeStore._refreshCommunityCache();
+            return data;
+          }
         }
-      }));
+      }
+
+      return await RecipeStore._fetchAndCacheCommunity();
     } catch (e) {
       console.error("Failed to fetch community recipes", e);
       return [];
+    }
+  },
+
+  /**
+   * Internal: Fetch from Supabase and cache results
+   */
+  _fetchAndCacheCommunity: async (): Promise<BananaApp[]> => {
+    const CACHE_KEY = 'banana_stand_community_cache';
+
+    const { data, error } = await supabase
+      .from('recipes')
+      .select('id, name, author_name, downloads, created_at, app_data')
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (error) throw error;
+
+    const recipes = data.map((row: any) => ({
+      ...row.app_data,
+      id: row.app_data.id,
+      author: row.author_name,
+      _community: {
+        author: row.author_name,
+        downloads: row.downloads
+      }
+    }));
+
+    // Cache the results
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+        data: recipes,
+        timestamp: Date.now()
+      }));
+    }
+
+    return recipes;
+  },
+
+  /**
+   * Internal: Refresh cache in background
+   */
+  _refreshCommunityCache: async (): Promise<void> => {
+    try {
+      await RecipeStore._fetchAndCacheCommunity();
+    } catch (e) {
+      // Silent fail for background refresh
     }
   },
 
