@@ -1,6 +1,7 @@
 
 import { BananaApp } from '../types';
 import { supabase } from './supabase';
+import { uploadRecipeImages } from './imageUploadService';
 
 const STORAGE_KEY = 'banana_stand_custom_recipes_v1';
 
@@ -45,15 +46,37 @@ export const RecipeStore = {
 
   /**
    * Publishes a recipe to the Community (Supabase).
+   * Uploads images to Storage first, then stores URLs instead of base64.
    */
   publishRecipe: async (app: BananaApp, authorName: string): Promise<boolean> => {
     try {
+      // Create a copy of the app to modify
+      const appToPublish = { ...app };
+
+      // Upload images to Supabase Storage and get URLs
+      const imageUrls = await uploadRecipeImages(
+        app.id,
+        app.example_input_image as string | undefined,
+        app.example_output_image as string | undefined
+      );
+
+      // Replace base64 images with URLs
+      if (imageUrls.inputUrl) {
+        appToPublish.example_input_image = imageUrls.inputUrl;
+      }
+      if (imageUrls.outputUrl) {
+        appToPublish.example_output_image = imageUrls.outputUrl;
+      }
+      if (imageUrls.coverUrl) {
+        appToPublish.cover_image = imageUrls.coverUrl;
+      }
+
       const { error } = await supabase
         .from('recipes')
         .insert({
-          name: app.name,
+          name: appToPublish.name,
           author_name: authorName,
-          app_data: app,
+          app_data: appToPublish,
           created_at: new Date().toISOString(),
           downloads: 0
         });
