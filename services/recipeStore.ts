@@ -22,17 +22,37 @@ export const RecipeStore = {
 
   /**
    * Saves a new app to LocalStorage.
+   * Strips large base64 images to avoid quota errors.
    */
   saveCustomApp: (app: BananaApp): BananaApp[] => {
     try {
       const current = RecipeStore.getCustomApps();
+
+      // Create a lightweight copy without large base64 images for localStorage
+      const appForStorage = { ...app };
+
+      // Only strip if they're base64 (not URLs)
+      if (appForStorage.example_input_image &&
+          typeof appForStorage.example_input_image === 'string' &&
+          appForStorage.example_input_image.startsWith('data:')) {
+        appForStorage.example_input_image = undefined;
+      }
+      if (appForStorage.example_output_image &&
+          appForStorage.example_output_image.startsWith('data:')) {
+        appForStorage.example_output_image = undefined;
+      }
+      if (appForStorage.cover_image &&
+          appForStorage.cover_image.startsWith('data:')) {
+        appForStorage.cover_image = undefined;
+      }
+
       // Add new app to the beginning of the list
-      const updated = [app, ...current];
+      const updated = [appForStorage, ...current.filter(a => a.id !== app.id)];
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return updated;
     } catch (e) {
       console.error("Failed to save custom recipe", e);
-      return [];
+      return RecipeStore.getCustomApps();
     }
   },
 
