@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
 import { BananaApp, AppInput } from '../types';
 import BuilderGuide from './BuilderGuide';
+import TestPromptModal from './TestPromptModal';
 import { FLAGSHIP_APPS, APP_CATEGORIES, SUGGESTED_TAGS } from '../constants';
 
 interface RecipeBuilderProps {
@@ -56,6 +57,9 @@ const RecipeBuilder: React.FC<RecipeBuilderProps> = ({ initialData, onSave, onPu
     // Auto-Fill Modal State
     const [showAutoFillModal, setShowAutoFillModal] = useState(false);
     const [pastedJson, setPastedJson] = useState('');
+
+    // Test Prompt Modal State
+    const [showTestPromptModal, setShowTestPromptModal] = useState(false);
 
     // --- Magic Randomizer Logic ---
     const handleMagicRandomizer = () => {
@@ -278,6 +282,14 @@ const RecipeBuilder: React.FC<RecipeBuilderProps> = ({ initialData, onSave, onPu
                         title="Copy JSON to clipboard"
                     >
                         Export JSON
+                    </button>
+
+                    <button
+                        onClick={() => setShowTestPromptModal(true)}
+                        className="px-4 py-2 rounded-full text-xs font-bold bg-white dark:bg-stone-800 text-stone-500 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:border-blue-400 dark:hover:border-blue-500 hover:text-stone-900 dark:hover:text-white transition-all shadow-sm flex items-center gap-2"
+                        title="Test recipe in Gemini"
+                    >
+                        <span>🧪</span> Test in Gemini
                     </button>
 
                     <button
@@ -748,6 +760,11 @@ const RecipeBuilder: React.FC<RecipeBuilderProps> = ({ initialData, onSave, onPu
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* --- TEST PROMPT MODAL --- */}
+            {showTestPromptModal && (
+                <TestPromptModal onClose={() => setShowTestPromptModal(false)} />
             )}
 
         </div>
