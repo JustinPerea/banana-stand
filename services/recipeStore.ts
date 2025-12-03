@@ -125,6 +125,7 @@ export const RecipeStore = {
       return data.map((row: any) => ({
         ...row.app_data,
         id: row.app_data.id, // Ensure ID matches
+        author: row.author_name, // Set author from database
         _community: {
           author: row.author_name,
           downloads: row.downloads
@@ -152,6 +153,7 @@ export const RecipeStore = {
       return data.map((row: any) => ({
         ...row.app_data,
         id: row.app_data.id,
+        author: row.author_name, // Set author from database
         _community: {
           author: row.author_name,
           downloads: row.downloads
