@@ -15,6 +15,7 @@ interface MarketplaceViewProps {
   userFavorites: string[];
   onToggleFavorite?: (appId: string) => void;
   onAuthorClick?: (author: string) => void;
+  isLoadingCommunity?: boolean;
 }
 
 const MarketplaceView: React.FC<MarketplaceViewProps> = ({
@@ -25,7 +26,8 @@ const MarketplaceView: React.FC<MarketplaceViewProps> = ({
   appStats,
   userFavorites,
   onToggleFavorite,
-  onAuthorClick
+  onAuthorClick,
+  isLoadingCommunity = false
 }) => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedAuthor, setSelectedAuthor] = useState<string | null>(null);
@@ -176,14 +178,32 @@ const MarketplaceView: React.FC<MarketplaceViewProps> = ({
             <span>🌍</span> Community Marketplace
           </h3>
           
-          {filteredCommunityApps.length === 0 && filteredFlagshipApps.length === 0 ? (
+          {isLoadingCommunity ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+              {/* Loading Skeleton Cards */}
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="bg-white dark:bg-stone-900 rounded-2xl overflow-hidden border border-stone-200 dark:border-stone-800 animate-pulse">
+                  <div className="aspect-[4/3] bg-stone-200 dark:bg-stone-800" />
+                  <div className="p-5 space-y-3">
+                    <div className="h-6 bg-stone-200 dark:bg-stone-800 rounded-lg w-3/4" />
+                    <div className="h-4 bg-stone-200 dark:bg-stone-800 rounded w-full" />
+                    <div className="h-4 bg-stone-200 dark:bg-stone-800 rounded w-2/3" />
+                    <div className="flex gap-2 pt-2">
+                      <div className="h-6 w-16 bg-stone-200 dark:bg-stone-800 rounded-full" />
+                      <div className="h-6 w-12 bg-stone-200 dark:bg-stone-800 rounded-full" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : filteredCommunityApps.length === 0 && filteredFlagshipApps.length === 0 ? (
              <div className="text-center py-20 text-stone-400 dark:text-stone-500">
                <div className="text-4xl mb-4">🌪️</div>
                <p className="font-bold">No apps found.</p>
                <p className="text-sm mt-1 opacity-70">
                     Try adjusting your filters to see more results.
                </p>
-               <button 
+               <button
                  onClick={() => { setSelectedCategory('All'); setSelectedAuthor(null); setSelectedTag(null); }}
                  className="mt-4 text-yellow-600 dark:text-yellow-500 hover:underline font-bold text-sm"
                >

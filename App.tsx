@@ -57,6 +57,9 @@ const AppContent = () => {
   const [profileRecipes, setProfileRecipes] = useState<BananaApp[]>([]);
   const [profileFavorites, setProfileFavorites] = useState<BananaApp[]>([]);
 
+  // Loading State
+  const [isLoadingCommunity, setIsLoadingCommunity] = useState(true);
+
   useEffect(() => {
       if (isDark) {
           document.documentElement.classList.add('dark');
@@ -74,7 +77,10 @@ const AppContent = () => {
     checkApiKey().then(setHasKey);
 
     // Load Community Apps
-    RecipeStore.fetchCommunityRecipes().then(setCommunityApps);
+    RecipeStore.fetchCommunityRecipes().then((apps) => {
+      setCommunityApps(apps);
+      setIsLoadingCommunity(false);
+    });
 
     // Load App Stats
     fetchAllAppStats().then(setAppStats);
@@ -422,6 +428,7 @@ const AppContent = () => {
             userFavorites={userFavorites}
             onToggleFavorite={user ? handleToggleFavorite : undefined}
             onAuthorClick={handleViewProfile}
+            isLoadingCommunity={isLoadingCommunity}
           />
         )}
       </main>
