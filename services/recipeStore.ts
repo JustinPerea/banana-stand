@@ -69,8 +69,11 @@ export const RecipeStore = {
   /**
    * Publishes a recipe to the Community (Supabase).
    * Uploads images to Storage first, then stores URLs instead of base64.
+   * @param app - The app to publish
+   * @param authorName - The author's display name
+   * @param userId - The authenticated user's ID (for RLS)
    */
-  publishRecipe: async (app: BananaApp, authorName: string): Promise<boolean> => {
+  publishRecipe: async (app: BananaApp, authorName: string, userId: string): Promise<boolean> => {
     try {
       // Create a copy of the app to modify
       const appToPublish = { ...app };
@@ -98,6 +101,7 @@ export const RecipeStore = {
         .insert({
           name: appToPublish.name,
           author_name: authorName,
+          user_id: userId,
           app_data: appToPublish,
           created_at: new Date().toISOString(),
           downloads: 0

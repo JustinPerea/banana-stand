@@ -279,8 +279,8 @@ const AppContent = () => {
     // 1. Save locally first
     handleSaveRecipe(newApp);
 
-    // 2. Publish to Supabase using the stored username
-    const success = await RecipeStore.publishRecipe(newApp, username);
+    // 2. Publish to Supabase using the stored username and user ID
+    const success = await RecipeStore.publishRecipe(newApp, username, user.id);
 
     if (success) {
       showToast("Published to Community Marketplace! 🌍", 'success');
