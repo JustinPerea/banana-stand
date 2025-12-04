@@ -151,7 +151,7 @@ export const RecipeStore = {
 
     const { data, error } = await supabase
       .from('recipes')
-      .select('id, name, author_name, downloads, created_at, app_data')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(50);
 
