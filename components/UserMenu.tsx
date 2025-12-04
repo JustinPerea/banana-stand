@@ -16,9 +16,11 @@ interface UserMenuProps {
     onHistoryItemClick?: (item: HistoryItem) => void;
     onHistoryUpdate?: () => void;
     onViewProfile?: () => void;
+    onEditUsername?: () => void;
+    username?: string | null;
 }
 
-const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, historyItems, onSelectApp, onCreateNew, onHistoryItemClick, onHistoryUpdate, onViewProfile }) => {
+const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, historyItems, onSelectApp, onCreateNew, onHistoryItemClick, onHistoryUpdate, onViewProfile, onEditUsername, username }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'recipes' | 'favorites' | 'history'>('recipes');
   const [isMobile, setIsMobile] = useState(false);
@@ -108,7 +110,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, his
                                 <div className="flex items-center justify-between">
                                     <div className="min-w-0 flex-1">
                                         <p className="text-sm font-bold text-stone-900 dark:text-stone-100 truncate">
-                                            {user.user_metadata?.full_name || 'User'}
+                                            {username || user.user_metadata?.full_name || 'User'}
                                         </p>
                                         <p className="text-xs text-stone-500 dark:text-stone-400 truncate">{user.email}</p>
                                     </div>
@@ -335,6 +337,21 @@ const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, his
                                         View My Profile
                                     </button>
                                 )}
+                                {onEditUsername && (
+                                    <button
+                                        onClick={() => {
+                                            onEditUsername();
+                                            setIsOpen(false);
+                                        }}
+                                        className="w-full text-left px-4 py-4 text-base text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 font-medium transition-colors rounded-lg flex items-center gap-3"
+                                    >
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                        {username ? 'Edit Username' : 'Set Username'}
+                                    </button>
+                                )}
                                 <button
                                     onClick={() => {
                                         signOut();
@@ -357,7 +374,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, his
                                 <div className="flex items-center justify-between">
                                     <div className="min-w-0 flex-1">
                                         <p className="text-xs font-bold text-stone-900 dark:text-stone-100 truncate">
-                                            {user.user_metadata?.full_name || 'User'}
+                                            {username || user.user_metadata?.full_name || 'User'}
                                         </p>
                                         <p className="text-[10px] text-stone-500 dark:text-stone-400 truncate">{user.email}</p>
                                     </div>
@@ -573,6 +590,21 @@ const UserMenu: React.FC<UserMenuProps> = ({ user, customApps, favoriteApps, his
                                             <circle cx="12" cy="7" r="4"></circle>
                                         </svg>
                                         View My Profile
+                                    </button>
+                                )}
+                                {onEditUsername && (
+                                    <button
+                                        onClick={() => {
+                                            onEditUsername();
+                                            setIsOpen(false);
+                                        }}
+                                        className="w-full text-left px-4 py-3 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 font-medium transition-colors rounded-lg flex items-center gap-2"
+                                    >
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                        {username ? 'Edit Username' : 'Set Username'}
                                     </button>
                                 )}
                                 <button

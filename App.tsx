@@ -10,6 +10,7 @@ import ImportRecipeModal from './components/ImportRecipeModal';
 import MarketplaceView from './components/MarketplaceView';
 import UserMenu from './components/UserMenu';
 import UserProfile from './components/UserProfile';
+import UsernameSetupModal from './components/UsernameSetupModal';
 import { ToastProvider, useToast } from './components/ToastProvider';
 import { RecipeStore } from './services/recipeStore';
 import { checkApiKey, requestApiKey, isAIStudioAvailable } from './services/geminiService';
@@ -18,6 +19,7 @@ import { User } from '@supabase/supabase-js';
 import { fetchAllAppStats, AppStats, getUserFavorites, toggleFavorite } from './services/statsService';
 import { HistoryService, HistoryItem } from './services/historyService';
 import { MigrationService } from './services/migrationService';
+import { getUsername } from './services/profileService';
 import { FLAGSHIP_APPS } from './constants';
 
 // Separate content component to use the hook
@@ -67,6 +69,11 @@ const AppContent = () => {
   // Loading State
   const [isLoadingCommunity, setIsLoadingCommunity] = useState(true);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+
+  // Username State
+  const [username, setUsername] = useState<string | null>(null);
+  const [showUsernameModal, setShowUsernameModal] = useState(false);
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
 
   useEffect(() => {
       if (isDark) {
@@ -157,12 +164,21 @@ const AppContent = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Load user favorites when user changes
+  // Load user favorites and username when user changes
   useEffect(() => {
     if (user) {
       getUserFavorites(user.id).then(setUserFavorites);
+      // Fetch username
+      getUsername(user.id).then((name) => {
+        setUsername(name);
+        // If user has no username, prompt them to create one
+        if (!name) {
+          setShowUsernameModal(true);
+        }
+      });
     } else {
       setUserFavorites([]);
+      setUsername(null);
     }
   }, [user]);
 
@@ -231,12 +247,24 @@ const AppContent = () => {
   };
 
   const handlePublish = async (newApp: BananaApp) => {
+    // Check if user is logged in
+    if (!user) {
+      showToast("Please sign in to publish recipes", 'error');
+      return;
+    }
+
+    // Check if user has a username set
+    if (!username) {
+      setShowUsernameModal(true);
+      showToast("Please set up your username first", 'error');
+      return;
+    }
+
     // 1. Save locally first
     handleSaveRecipe(newApp);
 
-    // 2. Publish to Supabase
-    const authorName = prompt("Enter your name for the community:", "Anonymous") || "Anonymous";
-    const success = await RecipeStore.publishRecipe(newApp, authorName);
+    // 2. Publish to Supabase using the stored username
+    const success = await RecipeStore.publishRecipe(newApp, username);
 
     if (success) {
       showToast("Published to Community Marketplace! 🌍", 'success');
@@ -349,9 +377,14 @@ const AppContent = () => {
                 onHistoryItemClick={setViewingHistoryItem}
                 onHistoryUpdate={refreshHistory}
                 onViewProfile={user ? () => {
-                    const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
+                    const userName = username || user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
                     handleViewProfile(userName, true);
                 } : undefined}
+                onEditUsername={user ? () => {
+                    setIsEditingUsername(true);
+                    setShowUsernameModal(true);
+                } : undefined}
+                username={username}
             />
           </div>
         </div>
@@ -465,6 +498,23 @@ const AppContent = () => {
         <ImportRecipeModal
           onClose={() => setShowImportModal(false)}
           onImport={onImportRecipe}
+        />
+      )}
+      {showUsernameModal && user && (
+        <UsernameSetupModal
+          userId={user.id}
+          currentUsername={username}
+          isEditing={isEditingUsername}
+          onComplete={(newUsername) => {
+            setUsername(newUsername);
+            setShowUsernameModal(false);
+            setIsEditingUsername(false);
+            showToast(`Username set to "${newUsername}"`, 'success');
+          }}
+          onCancel={isEditingUsername ? () => {
+            setShowUsernameModal(false);
+            setIsEditingUsername(false);
+          } : undefined}
         />
       )}
     </div>
