@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { BananaApp } from '../types';
 import AppCard from './AppCard';
 import SkeletonCard from './SkeletonCard';
+import Roadmap from './Roadmap';
 import { FLAGSHIP_APPS, APP_CATEGORIES } from '../constants';
 import FallingBananas from './FallingBananas';
 import { AppStats } from '../services/statsService';
@@ -226,6 +227,9 @@ const MarketplaceView: React.FC<MarketplaceViewProps> = ({
             </div>
           )}
         </section>
+
+        {/* Roadmap Section */}
+        <Roadmap />
 
       </div>
     </div>
