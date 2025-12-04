@@ -1,9 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BananaApp } from '../types';
 import AppCard from './AppCard';
 import { AppStats } from '../services/statsService';
 import { BananaIcon } from './Logo';
+import SkeletonCard, { SkeletonProfileHeader } from './SkeletonCard';
 
 interface UserProfileProps {
   authorName: string;
@@ -16,6 +17,7 @@ interface UserProfileProps {
   onToggleFavorite?: (appId: string) => void;
   onAuthorClick?: (author: string) => void;
   onTagClick?: (tag: string) => void;
+  isLoading?: boolean;
 }
 
 const UserProfile: React.FC<UserProfileProps> = ({
@@ -28,7 +30,8 @@ const UserProfile: React.FC<UserProfileProps> = ({
   userFavorites,
   onToggleFavorite,
   onAuthorClick,
-  onTagClick
+  onTagClick,
+  isLoading = false
 }) => {
   const [activeTab, setActiveTab] = useState<'recipes' | 'favorites'>('recipes');
 
@@ -49,6 +52,9 @@ const UserProfile: React.FC<UserProfileProps> = ({
       </button>
 
       {/* Profile Header */}
+      {isLoading ? (
+        <SkeletonProfileHeader />
+      ) : (
       <div className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-6 md:p-8 mb-8 transition-colors">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
           {/* Avatar */}
@@ -99,6 +105,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
           </div>
         </div>
       </div>
+      )}
 
       {/* Tabs */}
       <div className="flex border-b border-stone-200 dark:border-stone-800 mb-6">
@@ -133,7 +140,11 @@ const UserProfile: React.FC<UserProfileProps> = ({
       </div>
 
       {/* Content Grid */}
-      {displayApps.length === 0 ? (
+      {isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          <SkeletonCard count={6} />
+        </div>
+      ) : displayApps.length === 0 ? (
         <div className="text-center py-16 px-4">
           <div className="w-20 h-20 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl opacity-50">
             {activeTab === 'recipes' ? '🍌' : '❤️'}

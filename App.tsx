@@ -66,6 +66,7 @@ const AppContent = () => {
 
   // Loading State
   const [isLoadingCommunity, setIsLoadingCommunity] = useState(true);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
 
   useEffect(() => {
       if (isDark) {
@@ -107,27 +108,34 @@ const AppContent = () => {
     setSelectedApp(null);
     setIsBuilding(false);
     setViewingHistoryItem(null);
+    setIsLoadingProfile(true);
+    setProfileRecipes([]);
+    setProfileFavorites([]);
 
-    // Fetch recipes by this author
-    const recipes = await RecipeStore.fetchRecipesByAuthor(authorName);
+    try {
+      // Fetch recipes by this author
+      const recipes = await RecipeStore.fetchRecipesByAuthor(authorName);
 
-    // For "Banana Stand" official, include flagship apps
-    if (authorName === 'Banana Stand') {
-      setProfileRecipes([...FLAGSHIP_APPS, ...recipes]);
-    } else {
-      setProfileRecipes(recipes);
-    }
+      // For "Banana Stand" official, include flagship apps
+      if (authorName === 'Banana Stand') {
+        setProfileRecipes([...FLAGSHIP_APPS, ...recipes]);
+      } else {
+        setProfileRecipes(recipes);
+      }
 
-    // For own profile, show their favorites; for other profiles, empty (would need public favorites feature)
-    if (isOwnProfile) {
-      // Compute favorite apps from the current state
-      const allAppsNow = [...FLAGSHIP_APPS, ...communityApps, ...customApps];
-      const favApps = userFavorites
-        .map(id => allAppsNow.find(app => app.id === id))
-        .filter((app): app is BananaApp => app !== undefined);
-      setProfileFavorites(favApps);
-    } else {
-      setProfileFavorites([]);
+      // For own profile, show their favorites; for other profiles, empty (would need public favorites feature)
+      if (isOwnProfile) {
+        // Compute favorite apps from the current state
+        const allAppsNow = [...FLAGSHIP_APPS, ...communityApps, ...customApps];
+        const favApps = userFavorites
+          .map(id => allAppsNow.find(app => app.id === id))
+          .filter((app): app is BananaApp => app !== undefined);
+        setProfileFavorites(favApps);
+      } else {
+        setProfileFavorites([]);
+      }
+    } finally {
+      setIsLoadingProfile(false);
     }
   };
 
@@ -380,6 +388,7 @@ const AppContent = () => {
             userFavorites={userFavorites}
             onToggleFavorite={user ? handleToggleFavorite : undefined}
             onAuthorClick={handleViewProfile}
+            isLoading={isLoadingProfile}
           />
         ) : viewingHistoryItem ? (
           /* History Image Viewer */
