@@ -167,12 +167,17 @@ export const RecipeStore = {
       }
     }));
 
-    // Cache the results
+    // Try to cache (may fail if data too large for sessionStorage quota)
     if (typeof window !== 'undefined') {
-      sessionStorage.setItem(CACHE_KEY, JSON.stringify({
-        data: recipes,
-        timestamp: Date.now()
-      }));
+      try {
+        sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+          data: recipes,
+          timestamp: Date.now()
+        }));
+      } catch {
+        // Quota exceeded - continue without caching
+        console.warn('Community recipes too large to cache');
+      }
     }
 
     return recipes;
