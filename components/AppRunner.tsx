@@ -5,6 +5,7 @@ import { runBananaRecipe, checkApiKey } from '../services/geminiService';
 import BeforeAfterSlider from './BeforeAfterSlider';
 import BananaLoader from './BananaLoader';
 import { incrementUsageCount } from '../services/statsService';
+import { checkRateLimit } from '../services/rateLimitService';
 import { HistoryService } from '../services/historyService';
 
 interface AppRunnerProps {
@@ -258,10 +259,13 @@ const AppRunner: React.FC<AppRunnerProps> = ({ app, onBack, onRemix, onOpenSetti
         }
       }
 
-      // Increment usage count on successful generation
-      await incrementUsageCount(app.id);
-      if (onStatsUpdate) {
-        onStatsUpdate();
+      // Increment usage count on successful generation (with rate limiting)
+      const { allowed } = checkRateLimit('INCREMENT_USAGE', app.id);
+      if (allowed) {
+        await incrementUsageCount(app.id);
+        if (onStatsUpdate) {
+          onStatsUpdate();
+        }
       }
 
       // Save to local history (compressed)

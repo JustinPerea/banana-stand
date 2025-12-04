@@ -21,6 +21,7 @@ import { fetchAllAppStats, AppStats, getUserFavorites, toggleFavorite } from './
 import { HistoryService, HistoryItem } from './services/historyService';
 import { MigrationService } from './services/migrationService';
 import { getUsername } from './services/profileService';
+import { checkRateLimit, formatWaitTime } from './services/rateLimitService';
 import { FLAGSHIP_APPS } from './constants';
 
 // Separate content component to use the hook
@@ -183,10 +184,17 @@ const AppContent = () => {
     }
   }, [user]);
 
-  // Handle favorite toggle
+  // Handle favorite toggle with rate limiting
   const handleToggleFavorite = async (appId: string) => {
     if (!user) {
       showToast("Sign in to favorite apps!", 'error');
+      return;
+    }
+
+    // Check rate limit (2 seconds per app)
+    const { allowed, waitMs } = checkRateLimit('TOGGLE_FAVORITE', appId);
+    if (!allowed) {
+      showToast(`Please wait ${formatWaitTime(waitMs)}`, 'error');
       return;
     }
 
@@ -258,6 +266,13 @@ const AppContent = () => {
     if (!username) {
       setShowUsernameModal(true);
       showToast("Please set up your username first", 'error');
+      return;
+    }
+
+    // Check rate limit (30 seconds between publishes)
+    const { allowed, waitMs } = checkRateLimit('PUBLISH_RECIPE', user.id);
+    if (!allowed) {
+      showToast(`Please wait ${formatWaitTime(waitMs)} before publishing again`, 'error');
       return;
     }
 
