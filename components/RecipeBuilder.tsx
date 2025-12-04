@@ -92,7 +92,7 @@ const RecipeBuilder: React.FC<RecipeBuilderProps> = ({ initialData, onSave, onPu
     };
 
     const addInput = () => {
-        const id = `var_${inputs.length + 1} `;
+        const id = `var_${inputs.length + 1}`;
         setInputs([...inputs, { id, type: 'text', label: 'New Input' }]);
     };
 

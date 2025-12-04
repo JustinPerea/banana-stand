@@ -201,37 +201,93 @@ export const runBananaRecipe = async (
     targetAspectRatio = "1:1";
   }
 
-  // 6. Call API
-  const modelId = 'gemini-3-pro-image-preview'; 
+  // 6. Call API with timeout
+  const modelId = 'gemini-3-pro-image-preview';
+  const TIMEOUT_MS = 120000; // 2 minutes timeout for image generation
 
   try {
-    const response = await ai.models.generateContent({
-      model: modelId,
-      contents: { parts },
-      config: {
-        systemInstruction: app.system_instruction,
-        temperature: app.model_config.temperature,
-        imageConfig: {
-            aspectRatio: targetAspectRatio as any,
-            imageSize: "1K"
-        },
-        ...(app.model_config.thinking_mode ? { thinkingConfig: { thinkingBudget: 1024 } } : {})
-      },
+    // Create timeout promise
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => {
+        reject(new Error('TIMEOUT'));
+      }, TIMEOUT_MS);
     });
+
+    // Race between API call and timeout
+    const response = await Promise.race([
+      ai.models.generateContent({
+        model: modelId,
+        contents: { parts },
+        config: {
+          systemInstruction: app.system_instruction,
+          temperature: app.model_config.temperature,
+          imageConfig: {
+              aspectRatio: targetAspectRatio as any,
+              imageSize: "1K"
+          },
+          ...(app.model_config.thinking_mode ? { thinkingConfig: { thinkingBudget: 1024 } } : {})
+        },
+      }),
+      timeoutPromise
+    ]);
 
     return response;
   } catch (error: any) {
     console.error("Gemini Execution Error:", error);
 
-    // 7. Handle Rate Limits specifically
-    if (error.message && error.message.includes("429")) {
-        throw new Error("⚠️ Too Many Requests. The API is busy. Please wait a minute and try again.");
+    const errorMessage = error.message || '';
+    const errorStatus = error.status || error.code || '';
+
+    // Handle timeout
+    if (errorMessage === 'TIMEOUT') {
+      throw new Error("Request timed out. The server took too long to respond. Please try again.");
     }
 
-    if (error.message && error.message.includes("403")) {
-        throw new Error("⚠️ Access Denied. Your key might be invalid or restricted incorrectly. Check your domain settings in AI Studio.");
+    // Handle network errors
+    if (errorMessage.includes('fetch') || errorMessage.includes('network') || errorMessage.includes('Failed to fetch')) {
+      throw new Error("Network error. Please check your internet connection and try again.");
     }
-    
-    throw error;
+
+    // Handle rate limits (429)
+    if (errorMessage.includes("429") || errorStatus === 429) {
+      throw new Error("Too many requests. The API is busy. Please wait a minute and try again.");
+    }
+
+    // Handle authentication errors (401)
+    if (errorMessage.includes("401") || errorStatus === 401) {
+      throw new Error("Invalid API key. Please check your key in Settings.");
+    }
+
+    // Handle access denied (403)
+    if (errorMessage.includes("403") || errorStatus === 403) {
+      throw new Error("Access denied. Your API key might be invalid or have incorrect permissions. Check your domain settings in AI Studio.");
+    }
+
+    // Handle bad request (400)
+    if (errorMessage.includes("400") || errorStatus === 400) {
+      throw new Error("Invalid request. The image or prompt may be unsupported. Try a different image.");
+    }
+
+    // Handle content filtering / safety
+    if (errorMessage.includes("safety") || errorMessage.includes("blocked") || errorMessage.includes("SAFETY")) {
+      throw new Error("Content was blocked by safety filters. Please try a different image or prompt.");
+    }
+
+    // Handle quota exceeded
+    if (errorMessage.includes("quota") || errorMessage.includes("RESOURCE_EXHAUSTED")) {
+      throw new Error("API quota exceeded. You've reached your daily limit. Try again tomorrow or check your billing settings.");
+    }
+
+    // Handle server errors (500+)
+    if (errorMessage.includes("500") || errorMessage.includes("502") || errorMessage.includes("503") || errorStatus >= 500) {
+      throw new Error("Server error. Google's servers are having issues. Please try again in a few minutes.");
+    }
+
+    // Generic error with original message if available
+    if (errorMessage && errorMessage.length < 200) {
+      throw new Error(`Generation failed: ${errorMessage}`);
+    }
+
+    throw new Error("Something went wrong. Please try again.");
   }
 };

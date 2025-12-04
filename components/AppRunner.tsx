@@ -102,13 +102,38 @@ const AppRunner: React.FC<AppRunnerProps> = ({ app, onBack, onRemix, onOpenSetti
     }
   }, []);
 
+  // File validation constants
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
   const handleInputChange = (id: string, value: string | File) => {
+    // Validate file if it's a File object
+    if (value instanceof File) {
+      // Check file size
+      if (value.size > MAX_FILE_SIZE) {
+        setError(`File too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB.`);
+        return;
+      }
+
+      // Check file type
+      if (!ALLOWED_IMAGE_TYPES.includes(value.type)) {
+        setError('Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image.');
+        return;
+      }
+
+      // Clear any previous error
+      setError(null);
+    }
+
     setInputs(prev => ({ ...prev, [id]: value }));
-    
+
     if (value instanceof File) {
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreviews(prev => ({ ...prev, [id]: e.target?.result as string }));
+      };
+      reader.onerror = () => {
+        setError('Failed to read file. Please try another image.');
       };
       reader.readAsDataURL(value);
     }
@@ -497,8 +522,21 @@ const AppRunner: React.FC<AppRunnerProps> = ({ app, onBack, onRemix, onOpenSetti
 
         <div className="space-y-6">
             {error && (
-                <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl border border-red-100 dark:border-red-900 text-sm">
-                    {error}
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-100 dark:border-red-900">
+                    <div className="flex items-start gap-3">
+                        <div className="shrink-0 w-8 h-8 bg-red-100 dark:bg-red-900/40 rounded-full flex items-center justify-center">
+                            <span className="text-lg">⚠️</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-red-600 dark:text-red-400 text-sm font-medium">{error}</p>
+                            <button
+                                onClick={() => setError(null)}
+                                className="mt-2 text-xs font-bold text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 underline"
+                            >
+                                Dismiss
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 

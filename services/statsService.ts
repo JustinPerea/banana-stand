@@ -48,11 +48,19 @@ export async function fetchAppStats(appId: string): Promise<AppStats | null> {
 }
 
 // Increment usage count when an app is run
-export async function incrementUsageCount(appId: string): Promise<void> {
-  const { error } = await supabase.rpc('increment_usage', { app_id: appId });
+// Returns true if successful, false otherwise
+export async function incrementUsageCount(appId: string): Promise<boolean> {
+  try {
+    const { error } = await supabase.rpc('increment_usage', { app_id: appId });
 
-  if (error) {
-    console.error('Error incrementing usage count:', error);
+    if (error) {
+      console.error('Error incrementing usage count:', error);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('Exception incrementing usage count:', e);
+    return false;
   }
 }
 
@@ -88,39 +96,53 @@ export async function getUserFavorites(userId: string): Promise<string[]> {
 }
 
 // Toggle favorite status
+// Returns the new favorite state (true = favorited, false = not favorited)
 export async function toggleFavorite(userId: string, appId: string): Promise<boolean> {
-  // Check if already favorited
-  const isFavorited = await checkUserFavorite(userId, appId);
+  try {
+    // Check if already favorited
+    const isFavorited = await checkUserFavorite(userId, appId);
 
-  if (isFavorited) {
-    // Remove favorite
-    const { error: deleteError } = await supabase
-      .from('user_favorites')
-      .delete()
-      .eq('user_id', userId)
-      .eq('app_id', appId);
+    if (isFavorited) {
+      // Remove favorite
+      const { error: deleteError } = await supabase
+        .from('user_favorites')
+        .delete()
+        .eq('user_id', userId)
+        .eq('app_id', appId);
 
-    if (deleteError) {
-      console.error('Error removing favorite:', deleteError);
-      return true; // Return previous state on error
+      if (deleteError) {
+        console.error('Error removing favorite:', deleteError);
+        return true; // Return previous state on error
+      }
+
+      // Decrement favorite count (don't fail if this errors)
+      const { error: rpcError } = await supabase.rpc('decrement_favorite', { app_id: appId });
+      if (rpcError) {
+        console.error('Error decrementing favorite count:', rpcError);
+      }
+      return false;
+    } else {
+      // Add favorite
+      const { error: insertError } = await supabase
+        .from('user_favorites')
+        .insert({ user_id: userId, app_id: appId });
+
+      if (insertError) {
+        console.error('Error adding favorite:', insertError);
+        return false; // Return previous state on error
+      }
+
+      // Increment favorite count (don't fail if this errors)
+      const { error: rpcError } = await supabase.rpc('increment_favorite', { app_id: appId });
+      if (rpcError) {
+        console.error('Error incrementing favorite count:', rpcError);
+      }
+      return true;
     }
-
-    // Decrement favorite count
-    await supabase.rpc('decrement_favorite', { app_id: appId });
-    return false;
-  } else {
-    // Add favorite
-    const { error: insertError } = await supabase
-      .from('user_favorites')
-      .insert({ user_id: userId, app_id: appId });
-
-    if (insertError) {
-      console.error('Error adding favorite:', insertError);
-      return false; // Return previous state on error
-    }
-
-    // Increment favorite count
-    await supabase.rpc('increment_favorite', { app_id: appId });
-    return true;
+  } catch (e) {
+    console.error('Exception in toggleFavorite:', e);
+    // Return the opposite of expected to indicate failure
+    const currentState = await checkUserFavorite(userId, appId);
+    return currentState;
   }
 }

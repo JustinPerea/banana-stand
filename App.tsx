@@ -12,6 +12,7 @@ import UserMenu from './components/UserMenu';
 import UserProfile from './components/UserProfile';
 import UsernameSetupModal from './components/UsernameSetupModal';
 import { ToastProvider, useToast } from './components/ToastProvider';
+import ErrorBoundary from './components/ErrorBoundary';
 import { RecipeStore } from './services/recipeStore';
 import { checkApiKey, requestApiKey, isAIStudioAvailable } from './services/geminiService';
 import { supabase } from './services/supabase';
@@ -536,9 +537,11 @@ const AppContent = () => {
 
 const App = () => {
   return (
-    <ToastProvider>
-      <AppContent />
-    </ToastProvider>
+    <ErrorBoundary>
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
+    </ErrorBoundary>
   );
 };
 
