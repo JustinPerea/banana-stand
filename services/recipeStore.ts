@@ -1,9 +1,11 @@
-
+import { get, set } from 'idb-keyval';
 import { BananaApp } from '../types';
 import { supabase } from './supabase';
 import { uploadRecipeImages } from './imageUploadService';
 
-const STORAGE_KEY = 'banana_stand_custom_recipes_v1';
+const LOCAL_STORAGE_KEY = 'banana_stand_custom_recipes_v1';
+const CACHE_KEY = 'banana_stand_community_cache';
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 export const RecipeStore = {
   /**
@@ -12,7 +14,7 @@ export const RecipeStore = {
   getCustomApps: (): BananaApp[] => {
     if (typeof window === 'undefined') return [];
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
       return stored ? JSON.parse(stored) : [];
     } catch (e) {
       console.error("Failed to load custom recipes", e);
@@ -48,7 +50,7 @@ export const RecipeStore = {
 
       // Add new app to the beginning of the list
       const updated = [appForStorage, ...current.filter(a => a.id !== app.id)];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
       return updated;
     } catch (e) {
       console.error("Failed to save custom recipe", e);
@@ -60,7 +62,7 @@ export const RecipeStore = {
    * Clears all custom apps (Dev utility).
    */
   clearCustomApps: () => {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
     return [];
   },
 
@@ -105,7 +107,8 @@ export const RecipeStore = {
 
       // Invalidate cache so the new recipe shows up
       if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('banana_stand_community_cache');
+        // We use idb-keyval for caching now, so simple removal isn't synchronous but valid
+        set(CACHE_KEY, null).catch(console.error);
       }
 
       return true;
@@ -116,23 +119,24 @@ export const RecipeStore = {
   },
 
   /**
-   * Fetches recipes from the Community with caching.
+   * Fetches recipes from the Community with caching (via IndexedDB).
    */
   fetchCommunityRecipes: async (): Promise<BananaApp[]> => {
-    const CACHE_KEY = 'banana_stand_community_cache';
-    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
     try {
       // Check cache first
       if (typeof window !== 'undefined') {
-        const cached = sessionStorage.getItem(CACHE_KEY);
-        if (cached) {
-          const { data, timestamp } = JSON.parse(cached);
-          if (Date.now() - timestamp < CACHE_DURATION) {
-            // Return cached data immediately, but refresh in background
-            RecipeStore._refreshCommunityCache();
-            return data;
-          }
+        try {
+            const cached: any = await get(CACHE_KEY);
+            if (cached) {
+                const { data, timestamp } = cached;
+                if (Date.now() - timestamp < CACHE_DURATION) {
+                    // Return cached data immediately, but refresh in background
+                    RecipeStore._refreshCommunityCache();
+                    return data;
+                }
+            }
+        } catch (err) {
+            console.warn("Cache read error:", err);
         }
       }
 
@@ -147,8 +151,6 @@ export const RecipeStore = {
    * Internal: Fetch from Supabase and cache results
    */
   _fetchAndCacheCommunity: async (): Promise<BananaApp[]> => {
-    const CACHE_KEY = 'banana_stand_community_cache';
-
     const { data, error } = await supabase
       .from('recipes')
       .select('*')
@@ -167,16 +169,15 @@ export const RecipeStore = {
       }
     }));
 
-    // Try to cache (may fail if data too large for sessionStorage quota)
+    // Cache in IndexedDB (handles large payloads much better than sessionStorage)
     if (typeof window !== 'undefined') {
       try {
-        sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+        await set(CACHE_KEY, {
           data: recipes,
           timestamp: Date.now()
-        }));
-      } catch {
-        // Quota exceeded - continue without caching
-        console.warn('Community recipes too large to cache');
+        });
+      } catch (err) {
+        console.warn('Failed to cache community recipes to IndexedDB', err);
       }
     }
 

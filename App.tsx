@@ -17,6 +17,7 @@ import { supabase } from './services/supabase';
 import { User } from '@supabase/supabase-js';
 import { fetchAllAppStats, AppStats, getUserFavorites, toggleFavorite } from './services/statsService';
 import { HistoryService, HistoryItem } from './services/historyService';
+import { MigrationService } from './services/migrationService';
 import { FLAGSHIP_APPS } from './constants';
 
 // Separate content component to use the hook
@@ -43,6 +44,12 @@ const AppContent = () => {
     }
     return false;
   });
+
+  // Attach Migration Tool to Window
+  useEffect(() => {
+    (window as any).runMigration = MigrationService.fixLegacyRecipes;
+    console.log("🍌 Admin Tools: window.runMigration() is available.");
+  }, []);
 
   // App Stats State
   const [appStats, setAppStats] = useState<Record<string, AppStats>>({});
